@@ -1,0 +1,8 @@
+{
+  "watch": [
+    "test",
+    "src"
+  ],
+  "ext": "ts",
+  "exec": "jest"
+}

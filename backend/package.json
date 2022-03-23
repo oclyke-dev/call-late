@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "start": "nodemon --watch src --ext ts --exec 'ts-node -r dotenv/config src/index.ts'",
+    "test": "jest",
+    "test-reload": "nodemon --config nodemon.test.json"
   },
   "author": "oclyke",
   "license": "MIT",
@@ -11,7 +13,10 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.4.1",
+    "@types/mongodb": "^4.0.7",
+    "dotenv": "^16.0.0",
     "jest": "^27.5.1",
+    "mongodb": "^4.4.1",
     "mongodb-memory-server": "^8.4.1",
     "nodemon": "^2.0.15",
     "ts-node": "^10.7.0",
