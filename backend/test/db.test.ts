@@ -28,6 +28,8 @@ afterAll(async () => {
   await replset.stop();
 });
 
+// see how to use assertions in jest
+// https://jestjs.io/docs/expect
 test('this test to make the test suite valid', () => {
   expect(true).toBeTruthy();
 });
