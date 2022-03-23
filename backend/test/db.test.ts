@@ -35,3 +35,19 @@ test('this test to make the test suite valid', () => {
 test('that the client is provided by beforeAll()', () => {
   expect(client).toBeDefined();
 });
+
+test('verify connection', async () => {
+  await expect(client.db('admin').command({ ping: 1 })).resolves.toHaveProperty('ok', 1);
+});
+
+test('able to operate on db', async () => {
+  const collection = '1'; // name of collection does not matter
+  const newdoc = {'type': 'fast'};
+  await expect(client.db().collection(collection).insertOne(newdoc)).resolves.toHaveProperty('acknowledged', true);
+  await expect(client.db().collection(collection).findOne(newdoc)).resolves.toHaveProperty('_id');  
+});
+
+test('to see dbs', async () => {
+  await client.db('super').collection('234').insertOne({'flavor': 'pie'});
+  await expect(client.db().admin().listDatabases()).resolves.toHaveProperty('databases');
+});
