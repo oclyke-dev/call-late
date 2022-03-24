@@ -8,6 +8,7 @@ export type ID = string
 export type Hand = Array<number>
 export enum GamePhase {
   WAITING,
+  ORDERING,
   PLAYING,
   FINISHED,
 }
@@ -25,6 +26,7 @@ export type Room = OptionalId<{
   hands: Map<ID, Hand>
   players: Array<ID>
   phase: GamePhase
+  ordered: Array<ID>
 }>
 
 export interface Database {

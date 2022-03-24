@@ -38,3 +38,16 @@ export async function initialize_database(db: Database) {
   // this is to be called on brand-new databases
   const result = await db.rooms.createIndex({tag: 'text'}, {unique: true});
 }
+
+export function shuffle<T>(array: Array<T>) {
+  // https://bost.ocks.org/mike/shuffle/
+  var m = array.length
+  let t, i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
