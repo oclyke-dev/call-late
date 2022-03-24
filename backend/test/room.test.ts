@@ -18,6 +18,7 @@ import {
   add_player_to_room,
   advance_room_phase,
   add_user_to_order,
+  remove_user_from_order,
 } from '../src';
 
 import {
@@ -49,7 +50,9 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  await db.rooms.deleteMany({}); // make sure each test starts with clean collection of rooms
+  // make sure each test starts with clean collections
+  await db.rooms.deleteMany({});
+  await db.users.deleteMany({});
 });
 
 test('invalid rooms are not found', async () => {
@@ -109,6 +112,7 @@ test('setting the order of players', async () => {
     result = await add_user_to_order(db, roomid, userids[idx])
   }
   expect(result).toHaveProperty('ordered', orders.map(idx => userids[idx].toString()));
+  expect(result).toHaveProperty('phase', GamePhase.PLAYING); // adding all players to order begins play
 });
 
 test('setting order outside ORDERING phase', async () => {
@@ -120,4 +124,18 @@ test('setting order outside ORDERING phase', async () => {
   await expect(add_user_to_order(db, roomid, userid)).resolves.toBeNull();
   await advance_room_phase(db, roomid); // FINISHED
   await expect(add_user_to_order(db, roomid, userid)).resolves.toBeNull();
+});
+
+test('pulling players out of the order', async () => {
+  const roomid = await create_room(db, room_tag);
+  const userid = await create_user(db);
+  const userid2 = await create_user(db);
+  await add_player_to_room(db, roomid, userid);
+  await add_player_to_room(db, roomid, userid2);
+  await advance_room_phase(db, roomid); // ORDERING
+  await expect(add_user_to_order(db, roomid, userid)).resolves.toHaveProperty('ordered', [userid.toString()]);
+  await expect(remove_user_from_order(db, roomid, userid)).resolves.toHaveProperty('ordered', []);
+  await expect(add_user_to_order(db, roomid, userid2)).resolves.toHaveProperty('ordered', [userid2.toString()]);
+  const final = await add_user_to_order(db, roomid, userid);
+  expect(final).toHaveProperty('ordered', [userid2.toString(), userid.toString()]);
 });

@@ -14,6 +14,7 @@ export {
   add_player_to_room,
   advance_room_phase,
   add_user_to_order,
+  remove_user_from_order,
 } from './room';
 
 export {
