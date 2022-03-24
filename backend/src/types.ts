@@ -20,6 +20,6 @@ export type Room = OptionalId<{
   phase: GamePhase
 }>
 
-export interface Database extends Db {
+export interface Database {
   rooms: Collection<Room>
 }
