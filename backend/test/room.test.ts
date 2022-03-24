@@ -25,13 +25,7 @@ let db: Database
 let client: MongoClient;
 let replset: MongoMemoryReplSet;
 
-// a helper for making rooms with unique tags
 const room_tag = 'test_room';
-let tag_counter = 0;
-function get_test_tag() {
-  tag_counter++;
-  return `${room_tag}_${tag_counter}`; 
-}
 
 // see docs on jest setup / teardown as well as handling async code
 // https://jestjs.io/docs/setup-teardown
@@ -50,22 +44,26 @@ afterAll(async () => {
   await replset.stop();
 });
 
+beforeEach(async () => {
+  await db.rooms.deleteMany({}); // make sure each test starts with clean collection of rooms
+});
+
 test('invalid rooms are not found', async () => {
   await expect(get_room(db, new ObjectId('000000000000000000000000'))).resolves.toBeNull();
 });
 
 test('rooms can be created', async () => {
-  await expect(create_room(db, get_test_tag())).resolves.toBeInstanceOf(ObjectId);
+  await expect(create_room(db, room_tag)).resolves.toBeInstanceOf(ObjectId);
 });
 
 test('rooms can be recovered', async () => {
-  const id = await create_room(db, get_test_tag());
+  const id = await create_room(db, room_tag);
   await expect(get_room(db, id)).resolves.toHaveProperty('_id', id);
 });
 
 test('players can be added', async () => {
   const playerid = new ObjectId();
-  const roomid = await create_room(db, get_test_tag());
+  const roomid = await create_room(db, room_tag);
   await add_player_to_room(db, roomid, playerid);
   await expect(get_room(db, roomid)).resolves.toHaveProperty('players', [playerid.toString()]);
 });
