@@ -4,6 +4,7 @@
 export {
   Database,
   Room,
+  User,
 } from './types';
 
 export {
@@ -11,6 +12,12 @@ export {
   get_room,
   add_player_to_room,
 } from './room';
+
+export {
+  create_user,
+  get_user,
+  get_users_public,
+} from './user';
 
 export {
   start_server,

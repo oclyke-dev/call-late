@@ -29,6 +29,7 @@ export async function start_server() {
 export function get_database(client: MongoClient) {
   const db: Database = {
     rooms: client.db().collection('rooms'),
+    users: client.db().collection('users'),
   };
   return db;
 }
