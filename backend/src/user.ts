@@ -45,3 +45,12 @@ export async function get_users_public(db: Database, ids: ObjectId[]) {
   return users.map(u => get_public_info(u));
 }
 
+export async function increment_user_game_count(db: Database, userid: ObjectId) {
+  const {value} = await db.users.findOneAndUpdate({_id: userid}, {$inc: { total_games: 1}});
+  return value;
+}
+
+export async function increment_user_win_count(db: Database, userid: ObjectId) {
+  const {value} = await db.users.findOneAndUpdate({_id: userid}, {$inc: { total_wins: 1}});
+  return value;
+}

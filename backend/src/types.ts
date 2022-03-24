@@ -20,6 +20,22 @@ export type User = OptionalId<{
   total_wins: number
 }>
 
+export enum CardSource {
+  DISCARD,
+  RESERVE,
+}
+export type Turn = {
+  index: number | null
+  user: ID | null,
+  card: number | null
+  source: CardSource | null
+}
+
+export type Settings = {
+  total_cards: number
+  cards_per_hand: number
+}
+
 export type Room = OptionalId<{
   tag: string
   discard_stack: Array<number>
@@ -27,6 +43,8 @@ export type Room = OptionalId<{
   players: Array<ID>
   phase: GamePhase
   ordered: Array<ID>
+  turn: Turn
+  settings: Settings
 }>
 
 export interface Database {

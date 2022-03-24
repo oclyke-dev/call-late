@@ -6,6 +6,10 @@ export {
   Room,
   User,
   GamePhase,
+  Hand,
+  Turn,
+  CardSource,
+  Settings,
 } from './types';
 
 export {
@@ -21,6 +25,8 @@ export {
   create_user,
   get_user,
   get_users_public,
+  increment_user_game_count,
+  increment_user_win_count,
 } from './user';
 
 export {
