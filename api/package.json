@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "oclyke",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon --watch src --ext ts --exec 'ts-node -r dotenv/config src/index.ts'"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  }
+}
