@@ -15,6 +15,8 @@ export {
 export {
   create_room,
   get_room,
+  get_room_by_tag,
+  delete_room,
   add_player_to_room,
   advance_room_phase,
   add_user_to_order,

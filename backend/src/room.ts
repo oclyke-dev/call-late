@@ -49,6 +49,14 @@ export async function get_room(db: Database, _id: ObjectId) {
   return await db.rooms.findOne({_id});
 }
 
+export async function get_room_by_tag(db: Database, tag: string) {
+  return await db.rooms.findOne({tag});
+}
+
+export async function delete_room(db: Database, _id: ObjectId) {
+  return await db.rooms.deleteOne({_id});
+}
+
 export async function add_player_to_room(db: Database, roomid: ObjectId, userid: ObjectId) {
   const filter = {
     _id: roomid,
