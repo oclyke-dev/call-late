@@ -5,19 +5,31 @@
   "author": "oclyke",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --watch src --ext ts --exec 'ts-node -r dotenv/config src/index.ts'"
+    "codegen": "graphql-codegen --config codegen.yml",
+    "start": "nodemon --config nodemon.json"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/introspection": "^2.1.1",
+    "@graphql-codegen/typescript": "^2.4.8",
+    "@graphql-codegen/typescript-mongodb": "^2.3.6",
+    "@graphql-codegen/typescript-resolvers": "^2.6.1",
     "@types/node": "^17.0.23",
+    "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
+    "apollo-server": "^3.6.6",
     "dotenv": "^16.0.0",
     "eslint": "^8.11.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-import-resolver-typescript": "^2.7.0",
     "eslint-plugin-import": "^2.25.4",
+    "graphql": "^16.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.4.1",
     "nodemon": "^2.0.15",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.2"
+    "typescript": "^4.6.2",
+    "ws": "^8.5.0"
   }
 }

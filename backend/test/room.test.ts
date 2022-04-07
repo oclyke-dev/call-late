@@ -19,6 +19,8 @@ import {
   advance_room_phase,
   add_user_to_order,
   remove_user_from_order,
+  get_room_by_tag,
+  delete_room,
 } from '../src';
 
 import {
@@ -66,6 +68,19 @@ test('rooms can be created', async () => {
 test('rooms can be recovered', async () => {
   const id = await create_room(db, room_tag);
   await expect(get_room(db, id)).resolves.toHaveProperty('_id', id);
+});
+
+test('rooms can be recovered by tag', async () => {
+  const special_tag = 'unique_room_tag';
+  await create_room(db, special_tag);
+  await expect(get_room_by_tag(db, special_tag)).resolves.toHaveProperty('tag', special_tag);
+});
+
+test('rooms can be deleted', async () => {
+  const roomid = await create_room(db, room_tag);
+  await expect(get_room(db, roomid)).resolves.toHaveProperty('_id', roomid)
+  await delete_room(db, roomid);
+  await expect(get_room(db, roomid)).resolves.toBeNull()
 });
 
 test('players can be added during waiting phase', async () => {

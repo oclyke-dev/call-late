@@ -1,0 +1,57 @@
+scalar IntArrayDict
+
+enum GamePhase {
+  WAITING
+  ORDERING
+  PLAYING
+  FINISHED
+}
+enum CardSource {
+  DISCARD
+  RESERVE
+}
+
+type Query {
+  getRoomById(id: ID!): Room
+  getRoomByTag(tag: String!): Room
+  getUserById(id: ID!): User
+}
+
+type Mutation {
+  createRoom(tag: String!): ID
+  createUser: ID
+  addPlayerToRoom(room_id: ID!, user_id: ID!): Room
+}
+
+type Turn {
+  index: Int
+  user: ID
+  card: Int
+  source: CardSource
+}
+
+type Settings {
+  total_cards: Int!
+  cards_per_hand: Int!
+}
+
+
+type User {
+  _id: ID!
+  tag: String
+  color: String
+  total_games: Int
+  total_wins: Int
+}
+
+type Room {
+  _id: ID!
+  tag: String!
+  discard_stack: [Int!]!
+  hands: IntArrayDict
+  players: [ID!]!
+  phase: GamePhase
+  ordered: [ID!]!
+  turn: Turn
+  settings: Settings
+}
