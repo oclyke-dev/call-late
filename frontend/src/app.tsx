@@ -35,22 +35,26 @@ export default () => {
     </div>
 
 
-    <button
-      onClick={() => {
-        create_user();
-      }}
-    >
-      create user
-    </button>
+    <div>
+      <button
+        onClick={() => {
+          create_user();
+        }}
+      >
+        create user
+      </button>
+    </div>
 
-    <button
-      onClick={async () => {
-        console.log('clicked', room);
-        await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
-      }}
-    >
-      add user to game
-    </button>
+    <div>
+      <button
+        onClick={async () => {
+          console.log('clicked', room);
+          await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
+        }}
+      >
+        add user to game
+      </button>
+    </div>
 
     <div>
       <button
