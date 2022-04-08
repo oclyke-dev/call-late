@@ -11,13 +11,16 @@ export function get_schema() {
   return schema;
 }
 
+const TwilioEndpointSendUserId = process.env.TWILIO_ENDPOINT_SEND_USER_ID;
+const XTwilioSignature = process.env.TWILIO_SIGNATURE;
+
 export async function send_id_text(id: string, phone: string) {
   // @ts-ignore (until typescript supports the native fetch api in node)
-  return fetch('https://identity-share-1948.twil.io/mytest', {
+  return fetch(TwilioEndpointSendUserId, {
     method: 'POST',
     mode: 'cors',
     headers: {
-      'X-Twilio-Signature': 'ZqQw9ne8UnBSZK9jDxlwLHpVAHc=',
+      'X-Twilio-Signature': XTwilioSignature,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({

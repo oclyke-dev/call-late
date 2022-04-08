@@ -21,29 +21,70 @@ const user_fields = `{
   total_wins
 }`;
 
+const user_id_key = 'user_id';
+
 async function create_user(): Promise<string> {
   const result = await fetch_gql(`mutation { createUser }`);
   return result.data.createUser;
 }
 
-async function get_user(id: string): Promise<User> {
+async function get_user(id: string): Promise<User | null> {
   const result = await fetch_gql(`query ($id: ID!){ getUserById(id: $id)${user_fields}}`, {id});
   return result.data.getUserById;
 }
 
-export function useUser(): [(User | null), () => void] {
+async function verify_user(id: string, phone: string): Promise<string | null> {
+  const result = await fetch_gql(`query ($id: ID!, $phone: String!){ verifyUser(id: $id, phone: $phone)${user_fields}}`, {id, phone});
+  return result.data.verifyUser;
+}
+
+export function useUser(): [(User | null), (id: string, phone: string) => void, () => void] {
   const [user, setUser] = useState<User | null>(null);
 
-  const create = () => {
-    create_user()
-    .then(id => {
-      return get_user(id);
-    })
+  // get the initial user either from local storage id 
+  // or by creating a new user within the database
+  useEffect(() => {
+    const localid = localStorage.getItem(user_id_key);
+    if(!localid){
+      create_user()
+      .then(id => {
+        localStorage.setItem(user_id_key, id);
+        return get_user(id);
+      })
+      .then(user => {
+        console.log('got new user', user);
+        setUser(user);
+      })
+      .catch(console.error);
+    } else {
+      get_user(localid)
+      .then(user => {
+        setUser(user);
+      })
+      .catch(console.error);
+    }
+  }, []);
+
+  function sign_in(id: string, phone: string) {
+    // to sign in the database must confirm that the 
+    // supplied phone number matches the desired user
+    verify_user(id, phone)
     .then(user => {
+      if(user === null){
+        return Promise.reject('invalid credentials');
+      }
       setUser(user);
+      localStorage.setItem(user_id_key, id);
     })
     .catch(console.error);
   }
 
-  return [user, create];
+  function sign_out() {
+    // an id in localstorage authorizes use of that user
+    // (yeah, not super secure lol but its a silly game)
+    // therefore removing that id signs out the user
+    localStorage.removeItem(user_id_key);
+  }
+
+  return [user, sign_in, sign_out];
 }

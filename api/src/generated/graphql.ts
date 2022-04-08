@@ -62,6 +62,7 @@ export type Query = {
   getRoomById: Maybe<Room>;
   getRoomByTag: Maybe<Room>;
   getUserById: Maybe<User>;
+  verifyUser: Maybe<User>;
 };
 
 
@@ -77,6 +78,12 @@ export type QueryGetRoomByTagArgs = {
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryVerifyUserArgs = {
+  id: Scalars['ID'];
+  phone: Scalars['String'];
 };
 
 export type Room = {
@@ -279,6 +286,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getRoomById: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByIdArgs, 'id'>>;
   getRoomByTag: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByTagArgs, 'tag'>>;
   getUserById: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByIdArgs, 'id'>>;
+  verifyUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryVerifyUserArgs, 'id' | 'phone'>>;
 };
 
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {

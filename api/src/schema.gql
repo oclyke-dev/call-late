@@ -15,6 +15,7 @@ type Query {
   getRoomById(id: ID!): Room
   getRoomByTag(tag: String!): Room
   getUserById(id: ID!): User
+  verifyUser(id: ID!, phone: String!): User
 }
 
 type Mutation {

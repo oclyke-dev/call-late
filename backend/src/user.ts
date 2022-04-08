@@ -61,3 +61,7 @@ export async function associate_user_phone_number(db: Database, userid: ObjectId
   const {value} = await db.users.findOneAndUpdate({_id: userid, phone: {$in: [null, phone]}}, {$set: {phone}}, {returnDocument: 'after'});
   return value;
 }
+
+export async function verify_user(db: Database, _id: ObjectId, phone: string) {
+  return await db.users.findOne({_id, phone});
+}

@@ -10,6 +10,7 @@ import {
   create_user,
   get_user,
   associate_user_phone_number,
+  verify_user,
 } from '../../backend/src';
 
 import {
@@ -34,6 +35,9 @@ export const resolvers: any = {
     },
     getUserById: async (parent: any, args: any) => {
       return await get_user(db, new ObjectId(args.id));
+    },
+    verifyUser: async (parent: any, args: any) => {
+      return await verify_user(db, new ObjectId(args.id), args.phone);
     },
   },
   Mutation: {
