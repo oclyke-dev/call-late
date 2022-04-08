@@ -34,9 +34,16 @@ export enum GamePhase {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addPhoneNumberToUser: Maybe<User>;
   addPlayerToRoom: Maybe<Room>;
   createRoom: Maybe<Scalars['ID']>;
   createUser: Maybe<Scalars['ID']>;
+};
+
+
+export type MutationAddPhoneNumberToUserArgs = {
+  id: Scalars['ID'];
+  phone: Scalars['String'];
 };
 
 
@@ -103,6 +110,7 @@ export type User = {
   __typename?: 'User';
   _id: Scalars['ID'];
   color: Maybe<Scalars['String']>;
+  phone: Maybe<Scalars['String']>;
   tag: Maybe<Scalars['String']>;
   total_games: Maybe<Scalars['Int']>;
   total_wins: Maybe<Scalars['Int']>;
@@ -261,6 +269,7 @@ export interface IntArrayDictScalarConfig extends GraphQLScalarTypeConfig<Resolv
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addPhoneNumberToUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationAddPhoneNumberToUserArgs, 'id' | 'phone'>>;
   addPlayerToRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToRoomArgs, 'room_id' | 'user_id'>>;
   createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
   createUser: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
@@ -302,6 +311,7 @@ export type TurnResolvers<ContextType = any, ParentType extends ResolversParentT
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   _id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   color: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phone: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   tag: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   total_games: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   total_wins: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;

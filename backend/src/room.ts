@@ -72,7 +72,6 @@ export async function advance_room_phase(db: Database, roomid: ObjectId) {
 
   // handle special actions on phase transititions
   if (value.phase === GamePhase.PLAYING){
-    console.log(value)
     for(const id of value.players){
       await increment_user_game_count(db, new ObjectId(id));
     }

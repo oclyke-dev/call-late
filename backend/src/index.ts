@@ -29,6 +29,7 @@ export {
   get_users_public,
   increment_user_game_count,
   increment_user_win_count,
+  associate_user_phone_number,
 } from './user';
 
 export {

@@ -14,6 +14,7 @@ export enum GamePhase {
 }
 
 export type User = OptionalId<{
+  phone: string | null
   tag: string
   color: string
   total_games: number

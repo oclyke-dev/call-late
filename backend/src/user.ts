@@ -18,6 +18,7 @@ function get_random_tag() {
 
 export async function create_user(db: Database) {
   const user: User = {
+    phone: null,
     tag: get_random_tag(),
     color: get_random_color(),
     total_games: 0,
@@ -46,11 +47,17 @@ export async function get_users_public(db: Database, ids: ObjectId[]) {
 }
 
 export async function increment_user_game_count(db: Database, userid: ObjectId) {
-  const {value} = await db.users.findOneAndUpdate({_id: userid}, {$inc: { total_games: 1}});
+  const {value} = await db.users.findOneAndUpdate({_id: userid}, {$inc: { total_games: 1}}, {returnDocument: 'after'});
   return value;
 }
 
 export async function increment_user_win_count(db: Database, userid: ObjectId) {
-  const {value} = await db.users.findOneAndUpdate({_id: userid}, {$inc: { total_wins: 1}});
+  const {value} = await db.users.findOneAndUpdate({_id: userid}, {$inc: { total_wins: 1}}, {returnDocument: 'after'});
+  return value;
+}
+
+export async function associate_user_phone_number(db: Database, userid: ObjectId, phone: string) {
+  // only associate phones to users if there is no existing phone or the input matches the existing
+  const {value} = await db.users.findOneAndUpdate({_id: userid, phone: {$in: [null, phone]}}, {$set: {phone}}, {returnDocument: 'after'});
   return value;
 }

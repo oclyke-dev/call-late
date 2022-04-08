@@ -51,5 +51,19 @@ export default () => {
     >
       add user to game
     </button>
+
+    <div>
+      <button
+        onClick={async () => {
+          const id = user._id;
+          const phone = '+13037369483'; // format should include country code and only numeric values
+          console.log('trying to add phone number to player...', id, phone);
+          const response = await fetch_gql(`mutation ($id: ID!, $phone: String!){ addPhoneNumberToUser(id: $id, phone: $phone){ _id tag phone }}`, {id, phone});
+          console.log(response);
+        }}
+      >
+        add phone to player
+      </button>
+    </div>
   </>
 }

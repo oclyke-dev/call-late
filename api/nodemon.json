@@ -3,5 +3,5 @@
     "src"
   ],
   "ext": "ts, gql",
-  "exec": "ts-node -r dotenv/config src/index.ts"
+  "exec": "node --experimental-fetch --loader ts-node/esm -r dotenv/config src/index.ts"
 }

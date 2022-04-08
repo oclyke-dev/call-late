@@ -9,6 +9,7 @@ import {
   add_player_to_room,
   create_user,
   get_user,
+  associate_user_phone_number,
 } from '../../backend/src';
 
 import {
@@ -18,6 +19,10 @@ import {
 import {
   notify_room,
 } from './sessions';
+
+import {
+  send_id_text,
+} from './utils';
 
 export const resolvers: any = {
   Query: {
@@ -36,12 +41,20 @@ export const resolvers: any = {
       return await create_room(db, args.tag);
     },
     createUser: async (parent: any, args: any) => {
-      return await create_user(db);
+      const id = await create_user(db);
+      return id;
     },
     addPlayerToRoom: async (parent: any, args: any) => {
       const room = await add_player_to_room(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
       room !== null && await notify_room(room._id.toString());
       return room;
+    },
+    addPhoneNumberToUser: async (parent: any, args: any) => {
+      const result = await associate_user_phone_number(db, new ObjectId(args.id), args.phone);
+      if(result !== null){
+        await send_id_text(args.id, args.phone);
+      }
+      return result;
     },
   }
 }

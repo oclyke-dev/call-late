@@ -15,6 +15,7 @@ import {
   get_user,
   create_user,
   get_users_public,
+  associate_user_phone_number,
 } from '../src';
 
 import {
@@ -73,4 +74,17 @@ test('many users public info can be found', async () => {
   }));
   const result = await get_users_public(db, ids);
   expect(result).toHaveLength(num_users);
+});
+
+test('users can add phone numbers', async () => {
+  const phone = '+12025550102';
+  const wrong_phone = '+15052250102';
+  const id = await create_user(db);
+  await expect(get_user(db, id)).resolves.toHaveProperty('phone', null); // users start with no phone number
+  await expect(associate_user_phone_number(db, id, phone)).resolves.toHaveProperty('phone', phone); // users can add their number
+  await expect(associate_user_phone_number(db, id, wrong_phone)).resolves.toBeNull(); // reject association of a new phone number
+  await expect(get_user(db, id)).resolves.toHaveProperty('phone', phone); // original phone should be intact after incorrect association attempt
+  const final = await associate_user_phone_number(db, id, phone); // re-association of the original phone number is allowed and returns the user
+  expect(final).toHaveProperty('_id', id);
+  expect(final).toHaveProperty('phone', phone);
 });

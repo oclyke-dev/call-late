@@ -21,6 +21,7 @@ type Mutation {
   createRoom(tag: String!): ID
   createUser: ID
   addPlayerToRoom(room_id: ID!, user_id: ID!): Room
+  addPhoneNumberToUser(id: ID!, phone: String!): User
 }
 
 type Turn {
@@ -38,6 +39,7 @@ type Settings {
 
 type User {
   _id: ID!
+  phone: String
   tag: String
   color: String
   total_games: Int
