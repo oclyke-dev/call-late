@@ -21,6 +21,7 @@ const room_fields = `{
   hands
   players
   ordered
+  phase
   turn {
     index
     user

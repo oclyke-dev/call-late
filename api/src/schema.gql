@@ -1,11 +1,5 @@
 scalar IntArrayDict
 
-enum GamePhase {
-  WAITING
-  ORDERING
-  PLAYING
-  FINISHED
-}
 enum CardSource {
   DISCARD
   RESERVE
@@ -53,7 +47,7 @@ type Room {
   discard_stack: [Int!]!
   hands: IntArrayDict
   players: [ID!]!
-  phase: GamePhase
+  phase: Int
   ordered: [ID!]!
   turn: Turn
   settings: Settings

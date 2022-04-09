@@ -25,13 +25,6 @@ export enum CardSource {
   Reserve = 'RESERVE'
 }
 
-export enum GamePhase {
-  Finished = 'FINISHED',
-  Ordering = 'ORDERING',
-  Playing = 'PLAYING',
-  Waiting = 'WAITING'
-}
-
 export type Mutation = {
   __typename?: 'Mutation';
   addPhoneNumberToUser: Maybe<User>;
@@ -92,7 +85,7 @@ export type Room = {
   discard_stack: Array<Scalars['Int']>;
   hands: Maybe<Scalars['IntArrayDict']>;
   ordered: Array<Scalars['ID']>;
-  phase: Maybe<GamePhase>;
+  phase: Maybe<Scalars['Int']>;
   players: Array<Scalars['ID']>;
   settings: Maybe<Settings>;
   tag: Scalars['String'];
@@ -195,7 +188,6 @@ export type ResolversTypes = {
   AdditionalEntityFields: AdditionalEntityFields;
   String: ResolverTypeWrapper<Scalars['String']>;
   CardSource: CardSource;
-  GamePhase: GamePhase;
   IntArrayDict: ResolverTypeWrapper<Scalars['IntArrayDict']>;
   Mutation: ResolverTypeWrapper<{}>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
@@ -294,7 +286,7 @@ export type RoomResolvers<ContextType = any, ParentType extends ResolversParentT
   discard_stack: Resolver<Array<ResolversTypes['Int']>, ParentType, ContextType>;
   hands: Resolver<Maybe<ResolversTypes['IntArrayDict']>, ParentType, ContextType>;
   ordered: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
-  phase: Resolver<Maybe<ResolversTypes['GamePhase']>, ParentType, ContextType>;
+  phase: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   players: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   settings: Resolver<Maybe<ResolversTypes['Settings']>, ParentType, ContextType>;
   tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
