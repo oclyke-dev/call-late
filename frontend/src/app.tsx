@@ -36,17 +36,6 @@ export default () => {
       <pre>{(room !== null) && JSON.stringify(room, null, 2)}</pre>
     </div>
 
-
-    <div>
-      <button
-        onClick={() => {
-          create_user();
-        }}
-      >
-        create user
-      </button>
-    </div>
-
     <div>
       <button
         onClick={async () => {
