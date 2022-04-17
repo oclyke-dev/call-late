@@ -5,19 +5,30 @@ import {
 } from 'react';
 
 import {
+  Link,
+  useParams,
+} from 'react-router-dom';
+
+import {
   useRoom,
   useUser,
-} from './hooks';
+} from '../hooks';
 
 import {
   fetch_gql,
-} from './utils';
+} from '../utils';
 
 export default () => {
   const [room, join, leave] = useRoom();
   const [user, sign_in, sign_out] = useUser();
   const [signin, setSignin] = useState<{id: string, phone: string}>({id: '', phone: ''})
   const [settings, setSettings] = useState<{total_cards: string | number, cards_per_hand: string | number}>({total_cards: 0, cards_per_hand: 0})
+  const { tag } = useParams();
+
+  // make sure the room is joined
+  useEffect(async () => {
+    join(tag)
+  }, []);
 
   // sync settings with game state
   useEffect(() => {
@@ -29,12 +40,9 @@ export default () => {
     }
   }, [room])
 
-  useEffect(async () => {
-    join('testes tag')
-  }, []);
-
   return <>
-    hello world
+    <Link to='/'>call-late</Link>
+  
     <div>
       user info: 
       <pre>{(user !== null) && JSON.stringify(user, null, 2)}</pre>
@@ -227,5 +235,6 @@ export default () => {
         </button>
       </div>}
     </div>
+
   </>
 }

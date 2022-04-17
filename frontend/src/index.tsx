@@ -2,12 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {
-  default as App,
-} from './app';
+  BrowserRouter,
+  Routes,
+  Route,
+} from 'react-router-dom';
+
+import {
+  Game,
+  Start,
+} from './pages';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Start />} />
+        <Route path='/:tag' element={<Game />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
