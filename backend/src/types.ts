@@ -40,7 +40,7 @@ export type Settings = {
 export type Room = OptionalId<{
   tag: string
   discard_stack: Array<number>
-  hands: Map<ID, Hand>
+  hands: {[key: string]: Hand}
   players: Array<ID>
   phase: GamePhase
   ordered: Array<ID>

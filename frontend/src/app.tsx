@@ -38,12 +38,53 @@ export default () => {
 
     <div>
       <button
+        onClick={() => {
+          localStorage.clear();
+        }}
+      >
+        clear local storage
+      </button>
+    </div>
+
+    <div>
+      <button
         onClick={async () => {
           console.log('clicked', room);
           await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
         }}
       >
         add user to game
+      </button>
+    </div>
+
+    <div>
+      <button
+        onClick={async () => {
+          await fetch_gql(`mutation ($room_id: ID!){ startGame(room_id: $room_id){ _id tag phase players }}`, {room_id: room._id});
+        }}
+      >
+        start game
+      </button>
+    </div>
+
+    <div>
+      <button
+        onClick={async () => {
+          await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToOrder(room_id: $room_id, user_id: $user_id){ _id tag phase players }}`, {room_id: room._id, user_id: user._id});
+        }}
+      >
+        get in order
+      </button>
+    </div>
+
+    <div>
+      <button
+        disabled={room && user && room.turn.user !== user._id.toString()}
+        onClick={async () => {
+          await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ startTurn(room_id: $room_id, user_id: $user_id){ _id tag phase players }}`, {room_id: room._id, user_id: user._id});
+        }}
+      >
+        start turn
       </button>
     </div>
 

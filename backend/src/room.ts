@@ -5,6 +5,7 @@ import {
 import {
   Database,
   Room,
+  Hand,
   GamePhase,
   Turn,
   CardSource,
@@ -16,6 +17,7 @@ import {
 import {
   get_card_from_reserve,
   hand_is_sorted,
+  get_initial_cards,
 } from './utils';
 
 const initial_turn: Turn = {
@@ -37,7 +39,7 @@ export async function create_room(db: Database, tag: string) {
     players:[],
     ordered: [],
     phase: 0,
-    hands: new Map(),
+    hands: {},
     turn: initial_turn,
     settings: default_settings,
   };
@@ -72,6 +74,7 @@ export async function advance_room_phase(db: Database, roomid: ObjectId) {
 
   // handle special actions on phase transititions
   if (value.phase === GamePhase.PLAYING){
+    go_to_next_turn(db, value._id);
     for(const id of value.players){
       await increment_user_game_count(db, new ObjectId(id));
     }
@@ -89,6 +92,7 @@ export async function add_user_to_order(db: Database, roomid: ObjectId, userid: 
   };
   let {value} = await db.rooms.findOneAndUpdate(filter, {$push: {ordered: userid.toString()}}, {returnDocument: 'after'});
   if((value !== null) && (value.ordered.length === value.players.length)){
+    await initialize_state(db, roomid);
     return await advance_room_phase(db, roomid);
   }
   return value;
@@ -212,7 +216,7 @@ export async function finish_turn(db: Database, roomid: ObjectId, userid: Object
     throw new Error('you shouldnt be doing that dude!');
   }
 
-  const first_hand = room.hands.get(userid.toString());
+  const first_hand = room.hands[userid.toString()];
   if(typeof first_hand === 'undefined'){ return null; }
 
   const card_from_hand = first_hand[swap_at_idx];
@@ -226,7 +230,8 @@ export async function finish_turn(db: Database, roomid: ObjectId, userid: Object
   if(value === null){ return null; }
   const updated_room = value;
   if(updated_room.turn.user === null){ return updated_room; } // this should not happen but it makes TS happy
-  const hand = updated_room.hands.get(updated_room.turn.user) ;
+  
+  const hand = updated_room.hands[updated_room.turn.user];
   if(typeof hand !== 'undefined'){
     if(hand_is_sorted(hand)){
       await increment_user_win_count(db, userid);
@@ -245,4 +250,37 @@ export async function change_settings(db: Database, roomid: ObjectId, settings: 
   const update = {$set: {settings: settings}}
   const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
   return value;
+}
+
+export async function initialize_state(db: Database, roomid: ObjectId) {
+  const filter = {
+    _id: roomid,
+    phase: GamePhase.ORDERING,
+  };
+  
+  let room = await db.rooms.findOne(filter);
+  if(room === null){ return null; }
+
+  const num_players = room.players.length;
+  const total_cards = room.settings.total_cards;
+  const cards_per_hand = room.settings.cards_per_hand;
+  
+  const initial_cards = get_initial_cards(total_cards, num_players, cards_per_hand);
+
+  const hands: {[key: string]: Hand} = {};
+  let idx = 0;
+  for(const player_index in room.players){
+    const player = room.players[player_index];
+    console.log(player)
+    hands[player] = initial_cards.slice(cards_per_hand*(idx), cards_per_hand*(idx+1));
+    idx += 1;
+  }
+  const discard_stack = initial_cards.slice(-1);
+
+  console.log(hands);
+
+  const result = await db.rooms.findOneAndUpdate(filter, {$set: {discard_stack, hands}}, {returnDocument: 'after'});
+  room = result.value;
+
+  return room;
 }

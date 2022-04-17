@@ -60,7 +60,7 @@ export function get_card_from_reserve(room: Room): number {
   // values which are off-limits are those used in the discard pile or player's hands
   let used = [...room.discard_stack];
   for (const key in room.hands) {
-    const hand = room.hands.get(key);
+    const hand = room.hands[key];
     if(typeof hand !== 'undefined'){
       used = used.concat(hand);
     } 
@@ -102,11 +102,32 @@ export function hand_is_sorted(hand: Hand): boolean {
   if(signs.length < 2){
     return true;
   }
-  const sign = signs[0];
+  let pos_count = 0;
+  let neg_count = 0;
   signs.forEach(s => {
-    if (s !== sign){
-      return false;
+    if(s === -1){
+      neg_count += 1;
+    }
+    if(s === 1){
+      pos_count += 1;
+    }
+    if(s === 0){
+      throw new Error('there should be no duplicate cards so sign should never be zero')
     }
   })
+  if((neg_count !== 0) && (pos_count !== 0)){
+    return false; // must have zero of one to be sorted
+  }
   return true;
+}
+
+export function get_initial_cards(total_cards: number, num_players: number, cards_per_hand: number): number[] {
+  // returns num_players*cards_per_hand + 1 cards all drawn from a deck with card values in [0, total_cards)
+  // the +1 card should be used as the initial
+
+  const num_cards = num_players*cards_per_hand + 1;
+  const all_cards = [...new Array(total_cards)].map((_, idx) => idx); // this gets all the cards (not the most efficient way to do this... but whatever)
+  const shuffled = shuffle<number>(all_cards);
+  
+  return shuffled.slice(-1*num_cards);
 }

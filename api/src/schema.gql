@@ -1,10 +1,5 @@
 scalar IntArrayDict
 
-enum CardSource {
-  DISCARD
-  RESERVE
-}
-
 type Query {
   getRoomById(id: ID!): Room
   getRoomByTag(tag: String!): Room
@@ -16,6 +11,9 @@ type Mutation {
   createRoom(tag: String!): ID
   createUser: ID
   addPlayerToRoom(room_id: ID!, user_id: ID!): Room
+  startGame(room_id: ID!): Room
+  addPlayerToOrder(room_id: ID!, user_id: ID!): Room
+  startTurn(room_id: ID!, user_id: ID!, card_source: Int!): Room
   addPhoneNumberToUser(id: ID!, phone: String!): User
 }
 
@@ -23,7 +21,7 @@ type Turn {
   index: Int
   user: ID
   card: Int
-  source: CardSource
+  source: Int
 }
 
 type Settings {

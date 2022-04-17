@@ -20,23 +20,27 @@ export type AdditionalEntityFields = {
   type: InputMaybe<Scalars['String']>;
 };
 
-export enum CardSource {
-  Discard = 'DISCARD',
-  Reserve = 'RESERVE'
-}
-
 export type Mutation = {
   __typename?: 'Mutation';
   addPhoneNumberToUser: Maybe<User>;
+  addPlayerToOrder: Maybe<Room>;
   addPlayerToRoom: Maybe<Room>;
   createRoom: Maybe<Scalars['ID']>;
   createUser: Maybe<Scalars['ID']>;
+  startGame: Maybe<Room>;
+  startTurn: Maybe<Room>;
 };
 
 
 export type MutationAddPhoneNumberToUserArgs = {
   id: Scalars['ID'];
   phone: Scalars['String'];
+};
+
+
+export type MutationAddPlayerToOrderArgs = {
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
 };
 
 
@@ -48,6 +52,18 @@ export type MutationAddPlayerToRoomArgs = {
 
 export type MutationCreateRoomArgs = {
   tag: Scalars['String'];
+};
+
+
+export type MutationStartGameArgs = {
+  room_id: Scalars['ID'];
+};
+
+
+export type MutationStartTurnArgs = {
+  card_source: Scalars['Int'];
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
 };
 
 export type Query = {
@@ -102,7 +118,7 @@ export type Turn = {
   __typename?: 'Turn';
   card: Maybe<Scalars['Int']>;
   index: Maybe<Scalars['Int']>;
-  source: Maybe<CardSource>;
+  source: Maybe<Scalars['Int']>;
   user: Maybe<Scalars['ID']>;
 };
 
@@ -187,13 +203,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   AdditionalEntityFields: AdditionalEntityFields;
   String: ResolverTypeWrapper<Scalars['String']>;
-  CardSource: CardSource;
   IntArrayDict: ResolverTypeWrapper<Scalars['IntArrayDict']>;
   Mutation: ResolverTypeWrapper<{}>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
   Room: ResolverTypeWrapper<Room>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   Settings: ResolverTypeWrapper<Settings>;
   Turn: ResolverTypeWrapper<Turn>;
   User: ResolverTypeWrapper<User>;
@@ -207,9 +222,9 @@ export type ResolversParentTypes = {
   IntArrayDict: Scalars['IntArrayDict'];
   Mutation: {};
   ID: Scalars['ID'];
+  Int: Scalars['Int'];
   Query: {};
   Room: Room;
-  Int: Scalars['Int'];
   Settings: Settings;
   Turn: Turn;
   User: User;
@@ -269,9 +284,12 @@ export interface IntArrayDictScalarConfig extends GraphQLScalarTypeConfig<Resolv
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addPhoneNumberToUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationAddPhoneNumberToUserArgs, 'id' | 'phone'>>;
+  addPlayerToOrder: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToOrderArgs, 'room_id' | 'user_id'>>;
   addPlayerToRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToRoomArgs, 'room_id' | 'user_id'>>;
   createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
   createUser: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  startGame: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationStartGameArgs, 'room_id'>>;
+  startTurn: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationStartTurnArgs, 'card_source' | 'room_id' | 'user_id'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -303,7 +321,7 @@ export type SettingsResolvers<ContextType = any, ParentType extends ResolversPar
 export type TurnResolvers<ContextType = any, ParentType extends ResolversParentTypes['Turn'] = ResolversParentTypes['Turn']> = {
   card: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   index: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  source: Resolver<Maybe<ResolversTypes['CardSource']>, ParentType, ContextType>;
+  source: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   user: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

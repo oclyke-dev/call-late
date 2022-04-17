@@ -11,6 +11,9 @@ import {
   get_user,
   associate_user_phone_number,
   verify_user,
+  GamePhase,
+  advance_room_phase,
+  add_user_to_order,
 } from '../../backend/src';
 
 import {
@@ -24,6 +27,7 @@ import {
 import {
   send_id_text,
 } from './utils';
+import { start_turn } from '../../backend/src/room';
 
 export const resolvers: any = {
   Query: {
@@ -50,6 +54,24 @@ export const resolvers: any = {
     },
     addPlayerToRoom: async (parent: any, args: any) => {
       const room = await add_player_to_room(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    startGame: async (parent: any, args: any) => {
+      let room = await get_room(db, new ObjectId(args.room_id));
+      if(room === null){ throw new Error('room not found'); }
+      if(room.phase !== GamePhase.WAITING){ throw new Error('game already started'); }
+      room = await advance_room_phase(db, new ObjectId(args.room_id));
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    addPlayerToOrder: async (parent: any, args: any) => {
+      const room = await add_user_to_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    startTurn: async (parent: any, args: any) => {
+      const room = await start_turn(db, new ObjectId(args.room_id), new ObjectId(args.user_id), args.card_source);
       room !== null && await notify_room(room._id.toString());
       return room;
     },
