@@ -46,6 +46,7 @@ export async function create_room(db: Database, tag: string) {
     hands: {},
     turn: initial_turn,
     settings: default_settings,
+    winner: null
   };
   const result = await db.rooms.insertOne(room);
   return result.insertedId;
@@ -269,6 +270,7 @@ export async function finish_turn(db: Database, roomid: ObjectId, userid: Object
     if(typeof hand !== 'undefined'){
       if(hand_is_sorted(hand)){
         await increment_user_win_count(db, userid);
+        await set_winner(db, roomid, userid);
         return await advance_room_phase(db, roomid); // FINISHED
       }
     }
@@ -325,4 +327,9 @@ export async function initialize_state(db: Database, roomid: ObjectId) {
   room = result.value;
 
   return room;
+}
+
+export async function set_winner(db: Database, roomid: ObjectId, userid: ObjectId){
+  const {value} = await db.rooms.findOneAndUpdate({_id: roomid, winner: null}, {$set: {winner: userid.toString()}});
+  return value;
 }

@@ -15,7 +15,10 @@ import {
 export default (props: {room: Room}) => {
   const room = props.room;
 
+  console.log(room)
+
   return <>
     game finished!
+    the winner was {room.winner}
   </>
 }

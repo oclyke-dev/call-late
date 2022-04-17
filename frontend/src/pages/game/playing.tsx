@@ -17,6 +17,11 @@ import {
   Room,
 } from '../../../../backend/src';
 
+// ugh this is not a cute look, but the enum def from the backend can't 
+// be used because of a disallowed MIME type whatever that means
+const DISCARD = 0;
+const RESERVE = 1;
+
 export default (props: {room: Room}) => {
   const [user, sign_in, sign_out] = useUser();
   const room = props.room;
@@ -48,8 +53,7 @@ export default (props: {room: Room}) => {
         <button
           disabled={room && user && room.turn.user !== user._id.toString()}
           onClick={async () => {
-            console.warn('todo: somehow import the card source definitions from the backend codebase rather than relying on hard-coded values');
-            await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ startTurn(room_id: $room_id, user_id: $user_id, card_source: ${0}){ _id tag phase players }}`, {room_id: room._id, user_id: user._id});
+            await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ startTurn(room_id: $room_id, user_id: $user_id, card_source: ${DISCARD}){ _id tag phase players }}`, {room_id: room._id, user_id: user._id});
           }}
         >
           pick up discard
@@ -57,8 +61,7 @@ export default (props: {room: Room}) => {
         <button
           disabled={room && user && room.turn.user !== user._id.toString()}
           onClick={async () => {
-            console.warn('todo: somehow import the card source definitions from the backend codebase rather than relying on hard-coded values');
-            await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ startTurn(room_id: $room_id, user_id: $user_id, card_source: ${1}){ _id tag phase players }}`, {room_id: room._id, user_id: user._id});
+            await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ startTurn(room_id: $room_id, user_id: $user_id, card_source: ${RESERVE}){ _id tag phase players }}`, {room_id: room._id, user_id: user._id});
           }}
         >
           pick up new card

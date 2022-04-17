@@ -128,6 +128,7 @@ export type Room = {
   settings: Maybe<Settings>;
   tag: Scalars['String'];
   turn: Maybe<Turn>;
+  winner: Maybe<Scalars['ID']>;
 };
 
 export type Settings = {
@@ -334,6 +335,7 @@ export type RoomResolvers<ContextType = any, ParentType extends ResolversParentT
   settings: Resolver<Maybe<ResolversTypes['Settings']>, ParentType, ContextType>;
   tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   turn: Resolver<Maybe<ResolversTypes['Turn']>, ParentType, ContextType>;
+  winner: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

@@ -46,6 +46,7 @@ export type Room = OptionalId<{
   ordered: Array<ID>
   turn: Turn
   settings: Settings
+  winner: ID | null
 }>
 
 export interface Database {

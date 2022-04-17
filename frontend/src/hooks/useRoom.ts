@@ -21,6 +21,7 @@ const room_fields = `{
   players
   ordered
   phase
+  winner
   turn {
     index
     user

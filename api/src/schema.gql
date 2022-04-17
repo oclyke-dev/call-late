@@ -52,4 +52,5 @@ type Room {
   ordered: [ID!]!
   turn: Turn
   settings: Settings
+  winner: ID
 }
