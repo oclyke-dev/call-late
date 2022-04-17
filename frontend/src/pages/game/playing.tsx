@@ -68,6 +68,7 @@ export default (props: {room: Room}) => {
 
 
     {room.turn.source !== null && <div>
+      <div>you are holding: {room.turn.card}</div>
       <span>swap card with:</span>
       {room.hands[user._id.toString()].map((value, idx) => {
         return <button
