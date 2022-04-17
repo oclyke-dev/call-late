@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   useState,
   useRef,
@@ -58,7 +57,6 @@ export function useRoom(): [Room | null, (tag: string) => void, () => void] {
   // try to join a room by a given tag
   const join = (tag: string) => {
     if (socket.current !== null){
-      // throw new Error('cannot join a room while another room exists!')
       console.error('already connecting...')
       return;
     }
@@ -67,7 +65,6 @@ export function useRoom(): [Room | null, (tag: string) => void, () => void] {
 
     // when the socket opens register with the server and get the applicable room
     s.addEventListener('open', async (event) => {
-      console.log('connected to websocket!')
 
       get_room_by_tag(tag)
       .then((existing) => {
@@ -78,13 +75,11 @@ export function useRoom(): [Room | null, (tag: string) => void, () => void] {
         }
       })
       .then(_id => {
-        console.log('the game id is: ', _id)
         id.current = _id; // keep track of the id in case it is needed again
         s.send(_id);
         return get_room(_id);
       })
       .then(room => {
-        console.log('the initial room state is', room)
         setRoom(room);
       })
       .catch(console.error);

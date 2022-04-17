@@ -14,6 +14,7 @@ import {
   GamePhase,
   advance_room_phase,
   add_user_to_order,
+  change_settings,
 } from '../../backend/src';
 
 import {
@@ -86,6 +87,20 @@ export const resolvers: any = {
         await send_id_text(args.id, args.phone);
       }
       return result;
+    },
+    changeCardsPerHand: async (parent: any, args: any) => {
+      const roomid = new ObjectId(args.room_id);
+      const settings = {cards_per_hand: args.cards_per_hand};
+      const room = await change_settings(db, roomid, settings);
+      room !== null && await notify_room(roomid.toString());
+      return room;
+    },
+    changeTotalCards: async (parent: any, args: any) => {
+      const roomid = new ObjectId(args.room_id);
+      const settings = {total_cards: args.total_cards};
+      const room = await change_settings(db, roomid, settings);
+      room !== null && await notify_room(roomid.toString());
+      return room;
     },
   }
 }

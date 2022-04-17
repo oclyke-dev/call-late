@@ -31,6 +31,10 @@ const default_settings: Settings = {
   total_cards: 60,
   cards_per_hand: 10,
 }
+if(process.env.NODE_ENV === 'development'){
+  default_settings.cards_per_hand = 3;
+}
+
 
 export async function create_room(db: Database, tag: string) {
   const room: Room = {
@@ -74,10 +78,14 @@ export async function advance_room_phase(db: Database, roomid: ObjectId) {
 
   // handle special actions on phase transititions
   if (value.phase === GamePhase.PLAYING){
-    go_to_next_turn(db, value._id);
+    const room = await go_to_next_turn(db, value._id);
     for(const id of value.players){
       await increment_user_game_count(db, new ObjectId(id));
     }
+    return room;
+  }
+  if (value.phase === GamePhase.FINISHED){
+    return await initialize_turn_state(db, roomid);
   }
 
   return value;
@@ -106,6 +114,11 @@ export async function remove_user_from_order(db: Database, roomid: ObjectId, use
     ordered: {$all: [userid.toString()]}, // only remove the player if they are already in the ordered list
   };
   const {value} = await db.rooms.findOneAndUpdate(filter, {$pull: {ordered: userid.toString()}}, {returnDocument: 'after'});
+  return value;
+}
+
+export async function initialize_turn_state(db: Database, room_id: ObjectId) {
+  const {value} = await db.rooms.findOneAndUpdate({_id: room_id}, {$set: {turn: initial_turn}}, {returnDocument: 'after'});
   return value;
 }
 
@@ -264,12 +277,22 @@ export async function finish_turn(db: Database, roomid: ObjectId, userid: Object
   return await go_to_next_turn(db, roomid);
 }
 
-export async function change_settings(db: Database, roomid: ObjectId, settings: Settings) {
+export async function change_settings(db: Database, roomid: ObjectId, settings: Partial<Settings>) {
   const filter = {
     _id: roomid,
     phase: GamePhase.WAITING,
   };
-  const update = {$set: {settings: settings}}
+  const room = await db.rooms.findOne(filter);
+  if(room === null){ return null; }
+  
+  const update: {$set: any} = { $set: {}};
+  if(typeof settings.cards_per_hand !== 'undefined' && settings.cards_per_hand !== null){
+    update.$set['settings.cards_per_hand'] = settings.cards_per_hand;
+  }
+  if(typeof settings.total_cards !== 'undefined' && settings.total_cards !== null){
+    update.$set['settings.total_cards'] = settings.total_cards;
+  }
+
   const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
   return value;
 }

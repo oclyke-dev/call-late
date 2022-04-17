@@ -25,6 +25,8 @@ export type Mutation = {
   addPhoneNumberToUser: Maybe<User>;
   addPlayerToOrder: Maybe<Room>;
   addPlayerToRoom: Maybe<Room>;
+  changeCardsPerHand: Maybe<Room>;
+  changeTotalCards: Maybe<Room>;
   createRoom: Maybe<Scalars['ID']>;
   createUser: Maybe<Scalars['ID']>;
   finishTurn: Maybe<Room>;
@@ -48,6 +50,18 @@ export type MutationAddPlayerToOrderArgs = {
 export type MutationAddPlayerToRoomArgs = {
   room_id: Scalars['ID'];
   user_id: Scalars['ID'];
+};
+
+
+export type MutationChangeCardsPerHandArgs = {
+  cards_per_hand: Scalars['Int'];
+  room_id: Scalars['ID'];
+};
+
+
+export type MutationChangeTotalCardsArgs = {
+  room_id: Scalars['ID'];
+  total_cards: Scalars['Int'];
 };
 
 
@@ -294,6 +308,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addPhoneNumberToUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationAddPhoneNumberToUserArgs, 'id' | 'phone'>>;
   addPlayerToOrder: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToOrderArgs, 'room_id' | 'user_id'>>;
   addPlayerToRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToRoomArgs, 'room_id' | 'user_id'>>;
+  changeCardsPerHand: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationChangeCardsPerHandArgs, 'cards_per_hand' | 'room_id'>>;
+  changeTotalCards: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationChangeTotalCardsArgs, 'room_id' | 'total_cards'>>;
   createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
   createUser: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   finishTurn: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationFinishTurnArgs, 'room_id' | 'user_id'>>;

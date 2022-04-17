@@ -21,6 +21,7 @@ export {
   advance_room_phase,
   add_user_to_order,
   remove_user_from_order,
+  change_settings,
 } from './room';
 
 export {
