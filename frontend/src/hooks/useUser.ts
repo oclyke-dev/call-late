@@ -60,6 +60,7 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
       get_user(localid)
       .then(user => {
         if(user === null){
+          localStorage.clear(); // try to remedy this...
           return Promise.reject(`user with id: '${localid}' not found in database`);
         }
         setUser(user);
