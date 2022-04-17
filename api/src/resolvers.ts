@@ -27,7 +27,7 @@ import {
 import {
   send_id_text,
 } from './utils';
-import { start_turn } from '../../backend/src/room';
+import { finish_turn, start_turn } from '../../backend/src/room';
 
 export const resolvers: any = {
   Query: {
@@ -72,6 +72,11 @@ export const resolvers: any = {
     },
     startTurn: async (parent: any, args: any) => {
       const room = await start_turn(db, new ObjectId(args.room_id), new ObjectId(args.user_id), args.card_source);
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    finishTurn: async (parent: any, args: any) => {
+      const room = await finish_turn(db, new ObjectId(args.room_id), new ObjectId(args.user_id), args.swap_index);
       room !== null && await notify_room(room._id.toString());
       return room;
     },

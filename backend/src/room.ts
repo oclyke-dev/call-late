@@ -124,7 +124,7 @@ export async function go_to_next_turn(db: Database, roomid: ObjectId) {
     next_idx = 0;
   }
   const next_user = room.ordered[next_idx];
-  const new_turn = {...initial_turn, user: next_user, idx: next_idx};
+  const new_turn = {...initial_turn, user: next_user, index: next_idx};
   const update = { $set: { turn: new_turn} };
 
   const filter = {
@@ -195,7 +195,7 @@ export async function start_turn(db: Database, roomid: ObjectId, userid: ObjectI
   return value;
 }
 
-export async function finish_turn(db: Database, roomid: ObjectId, userid: ObjectId, swap_at_idx: number) {
+export async function finish_turn(db: Database, roomid: ObjectId, userid: ObjectId, swap_at_idx: number | null) {
   // card from user's hand at the chosen index gets pushed onto the discard stack
   // check hand for sortedness
   // (if so, advance game to FINISHED, else turn advances)
@@ -212,34 +212,56 @@ export async function finish_turn(db: Database, roomid: ObjectId, userid: Object
   const room = await db.rooms.findOne(filter);
   if(room === null){ return null; }
 
-  if(swap_at_idx >= room.settings.cards_per_hand){
-    throw new Error('you shouldnt be doing that dude!');
-  }
+  const card_from_turn = room.turn.card;
 
-  const first_hand = room.hands[userid.toString()];
-  if(typeof first_hand === 'undefined'){ return null; }
+  if(swap_at_idx === null) {
+    // user wants to just discard this card...
+    const update = {
+      $push: {
+        discard_stack: {
+          $each: [card_from_turn],
+          $position: 0,
+        }
+      },
+    };
 
-  const card_from_hand = first_hand[swap_at_idx];
-  const update = {
-    $set: {
-      [`hands.${userid.toString()}.${swap_at_idx}`]: card_from_hand,
+    await db.rooms.findOneAndUpdate(filter, (update as any), {returnDocument: 'after'});
+  } else {
+    if(swap_at_idx >= room.settings.cards_per_hand){
+      throw new Error('you shouldnt be doing that dude!');
     }
-  }
-
-  const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
-  if(value === null){ return null; }
-  const updated_room = value;
-  if(updated_room.turn.user === null){ return updated_room; } // this should not happen but it makes TS happy
   
-  const hand = updated_room.hands[updated_room.turn.user];
-  if(typeof hand !== 'undefined'){
-    if(hand_is_sorted(hand)){
-      await increment_user_win_count(db, userid);
-      return await advance_room_phase(db, roomid); // FINISHED
+    const first_hand = room.hands[userid.toString()];
+    if(typeof first_hand === 'undefined'){ return null; }
+  
+    const card_from_hand = first_hand[swap_at_idx];
+    const update = {
+      $set: {
+        [`hands.${userid.toString()}.${swap_at_idx}`]: card_from_turn,
+      },
+      $push: {
+        discard_stack: {
+          $each: [card_from_hand],
+          $position: 0,
+        }
+      }
+    }
+  
+    const {value} = await db.rooms.findOneAndUpdate(filter, (update as any), {returnDocument: 'after'});
+    if(value === null){ return null; }
+    const updated_room = value;
+    if(updated_room.turn.user === null){ return updated_room; } // this should not happen but it makes TS happy
+    
+    const hand = updated_room.hands[updated_room.turn.user];
+    if(typeof hand !== 'undefined'){
+      if(hand_is_sorted(hand)){
+        await increment_user_win_count(db, userid);
+        return await advance_room_phase(db, roomid); // FINISHED
+      }
     }
   }
-  await go_to_next_turn(db, roomid);
-  return updated_room;
+
+  return await go_to_next_turn(db, roomid);
 }
 
 export async function change_settings(db: Database, roomid: ObjectId, settings: Settings) {
@@ -271,13 +293,10 @@ export async function initialize_state(db: Database, roomid: ObjectId) {
   let idx = 0;
   for(const player_index in room.players){
     const player = room.players[player_index];
-    console.log(player)
     hands[player] = initial_cards.slice(cards_per_hand*(idx), cards_per_hand*(idx+1));
     idx += 1;
   }
   const discard_stack = initial_cards.slice(-1);
-
-  console.log(hands);
 
   const result = await db.rooms.findOneAndUpdate(filter, {$set: {discard_stack, hands}}, {returnDocument: 'after'});
   room = result.value;

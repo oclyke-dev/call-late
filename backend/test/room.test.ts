@@ -27,6 +27,7 @@ import {
   start_server,
   shuffle,
 } from '../src/utils';
+import { finish_turn, start_turn } from '../src/room';
 
 let db: Database
 let client: MongoClient;
@@ -153,4 +154,18 @@ test('pulling players out of the order', async () => {
   await expect(add_user_to_order(db, roomid, userid2)).resolves.toHaveProperty('ordered', [userid2.toString()]);
   const final = await add_user_to_order(db, roomid, userid);
   expect(final).toHaveProperty('ordered', [userid2.toString(), userid.toString()]);
+});
+
+test('advancing the turn should work right', async () => {
+  const roomid = await create_room(db, room_tag);
+  const userid = await create_user(db);
+  const userid2 = await create_user(db);
+  await add_player_to_room(db, roomid, userid);
+  await add_player_to_room(db, roomid, userid2);
+  await advance_room_phase(db, roomid); // ORDERING
+  await add_user_to_order(db, roomid, userid);
+  await add_user_to_order(db, roomid, userid2);
+  await expect(get_room(db, roomid)).resolves.toHaveProperty('phase', GamePhase.PLAYING);
+  await start_turn(db, roomid, userid, 0);
+  await expect(finish_turn(db, roomid, userid, null)).resolves.toHaveProperty('turn.index', 1);
 });
