@@ -20,6 +20,11 @@ export default () => {
     user page
 
     <div>
+      user info: 
+      <pre>{(user !== null) && JSON.stringify(user, null, 2)}</pre>
+    </div>
+
+    <div>
       <button
         onClick={async () => {
           const id = user._id;

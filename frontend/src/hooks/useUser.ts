@@ -67,7 +67,7 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
       })
       .catch(console.error);
     }
-  }, []);
+  }, [user]);
 
   function sign_in(id: string, phone: string) {
     // to sign in the database must confirm that the 
@@ -88,6 +88,7 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
     // (yeah, not super secure lol but its a silly game)
     // therefore removing that id signs out the user
     localStorage.removeItem(user_id_key);
+    setUser(null);
   }
 
   return [user, sign_in, sign_out];
