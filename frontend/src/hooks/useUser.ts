@@ -19,6 +19,7 @@ const user_fields = `{
   color
   total_games
   total_wins
+  phone
 }`;
 
 const user_id_key = 'user_id';
@@ -38,7 +39,7 @@ async function verify_user(id: string, phone: string): Promise<string | null> {
   return result.data.verifyUser;
 }
 
-export function useUser(): [(User | null), (id: string, phone: string) => void, () => void] {
+export function useUser(): [(User | null), (id: string, phone: string) => void, () => void, (phone: string) => void] {
   const [user, setUser] = useState<User | null>(null);
 
   // get the initial user either from local storage id 
@@ -91,5 +92,10 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
     setUser(null);
   }
 
-  return [user, sign_in, sign_out];
+  async function associate_phone(phone: string) {
+    // const phone = '+13037369483'; // format should include country code and only numeric values
+    await fetch_gql(`mutation ($id: ID!, $phone: String!){ addPhoneNumberToUser(id: $id, phone: $phone){ _id tag phone }}`, {id: user._id, phone});
+  }
+
+  return [user, sign_in, sign_out, associate_phone];
 }

@@ -13,7 +13,7 @@ import {
 } from '../utils';
 
 export default () => {
-  const [user, sign_in, sign_out] = useUser();
+  const [user, sign_in, sign_out, associate_phone] = useUser();
   const [signin, setSignin] = useState<{id: string, phone: string}>({id: '', phone: ''})
 
   return <>
@@ -27,11 +27,7 @@ export default () => {
     <div>
       <button
         onClick={async () => {
-          const id = user._id;
-          const phone = '+13037369483'; // format should include country code and only numeric values
-          console.log('trying to add phone number to player...', id, phone);
-          const response = await fetch_gql(`mutation ($id: ID!, $phone: String!){ addPhoneNumberToUser(id: $id, phone: $phone){ _id tag phone }}`, {id, phone});
-          console.log(response);
+          await associate_phone('+13037369483');
         }}
       >
         add phone to player
