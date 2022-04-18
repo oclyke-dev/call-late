@@ -14,6 +14,7 @@ import {
   GamePhase,
   advance_room_phase,
   add_user_to_order,
+  remove_user_from_order,
   change_settings,
 } from '../../backend/src';
 
@@ -68,6 +69,11 @@ export const resolvers: any = {
     },
     addPlayerToOrder: async (parent: any, args: any) => {
       const room = await add_user_to_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    removePlayerFromOrder: async (parent: any, args: any) => {
+      const room = await remove_user_from_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
       room !== null && await notify_room(room._id.toString());
       return room;
     },
