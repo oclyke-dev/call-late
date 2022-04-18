@@ -36,29 +36,33 @@ export default (props: {room: Room}) => {
     }
   }, [room]);
 
+  if(user && !room.players.includes(user._id.toString())){
+    fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
+  }
+
   return <>
     waiting page
 
     <div>
-        <button
-          onClick={async () => {
-            console.log('clicked', room);
-            await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
-          }}
-        >
-          add user to game
-        </button>
-      </div>
+      players in game:
+      {room.players.map(id => id.toString()).map((id, idx) => {
+        return <React.Fragment key={`player.${id}`}>
+          <div>
+            {id}
+          </div>
+        </React.Fragment>
+      })}
+    </div>
 
-      <div>
-        <button
-          onClick={async () => {
-            await fetch_gql(`mutation ($room_id: ID!){ startGame(room_id: $room_id){ _id tag phase players }}`, {room_id: room._id});
-          }}
-        >
-          start game
-        </button>
-      </div>
+    <div>
+      <button
+        onClick={async () => {
+          await fetch_gql(`mutation ($room_id: ID!){ startGame(room_id: $room_id){ _id tag phase players }}`, {room_id: room._id});
+        }}
+      >
+        start game
+      </button>
+    </div>
 
     <div>
       <input

@@ -41,11 +41,11 @@ export default (props: {room: Room}) => {
     </div>
 
     {room.hands[user._id.toString()].map((value, idx) => {
-      return <>
+      return <React.Fragment key={`hand.${idx}`}>
         <div>
           {value}
         </div>
-      </>
+      </ React.Fragment>
     })}
 
     {room && user && room.turn.user === user._id.toString() && <div style={{backgroundCOlor: 'green'}}>
