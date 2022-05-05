@@ -16,6 +16,7 @@ import {
   add_user_to_order,
   remove_user_from_order,
   change_settings,
+  reset_room,
 } from '../../backend/src';
 
 import {
@@ -64,6 +65,11 @@ export const resolvers: any = {
       if(room === null){ throw new Error('room not found'); }
       if(room.phase !== GamePhase.WAITING){ throw new Error('game already started'); }
       room = await advance_room_phase(db, new ObjectId(args.room_id));
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    resetRoom: async (parent: any, args: any) => {
+      const room = await reset_room(db, new ObjectId(args.room_id), args.tag);
       room !== null && await notify_room(room._id.toString());
       return room;
     },

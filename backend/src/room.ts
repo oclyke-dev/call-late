@@ -35,9 +35,8 @@ if(process.env.NODE_ENV === 'development'){
   default_settings.cards_per_hand = 3;
 }
 
-
-export async function create_room(db: Database, tag: string) {
-  const room: Room = {
+function make_room(tag: string): Room {
+  return {
     tag,
     discard_stack: [],
     players:[],
@@ -48,6 +47,10 @@ export async function create_room(db: Database, tag: string) {
     settings: default_settings,
     winner: null
   };
+}
+
+export async function create_room(db: Database, tag: string) {
+  const room = make_room(tag);
   const result = await db.rooms.insertOne(room);
   return result.insertedId;
 }
@@ -62,6 +65,11 @@ export async function get_room_by_tag(db: Database, tag: string) {
 
 export async function delete_room(db: Database, _id: ObjectId) {
   return await db.rooms.deleteOne({_id});
+}
+
+export async function reset_room(db: Database, roomid: ObjectId, tag: string) {
+  const {value} = await db.rooms.findOneAndReplace({_id: roomid, tag, phase: GamePhase.FINISHED}, make_room(tag), {returnDocument: 'after'});
+  return value;
 }
 
 export async function add_player_to_room(db: Database, roomid: ObjectId, userid: ObjectId) {

@@ -22,6 +22,7 @@ export {
   add_user_to_order,
   remove_user_from_order,
   change_settings,
+  reset_room,
 } from './room';
 
 export {
