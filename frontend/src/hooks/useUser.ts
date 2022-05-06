@@ -40,6 +40,7 @@ async function verify_user(id: string, phone: string): Promise<string | null> {
 }
 
 export function useUser(): [(User | null), (id: string, phone: string) => void, () => void, (phone: string) => void] {
+  const [nonce, setNonce] = useState(new Object());
   const [user, setUser] = useState<User | null>(null);
 
   // get the initial user either from local storage id 
@@ -62,13 +63,14 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
       .then(user => {
         if(user === null){
           localStorage.clear(); // try to remedy this...
+          setNonce(new Object());
           return Promise.reject(`user with id: '${localid}' not found in database`);
         }
         setUser(user);
       })
       .catch(console.error);
     }
-  }, [user]);
+  }, [nonce]);
 
   function sign_in(id: string, phone: string) {
     // to sign in the database must confirm that the 
