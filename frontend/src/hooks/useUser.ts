@@ -34,7 +34,7 @@ async function get_user(id: string): Promise<User | null> {
   return result.data.getUserById;
 }
 
-async function verify_user(id: string, phone: string): Promise<string | null> {
+async function verify_user(id: string, phone: string): Promise<User | null> {
   const result = await fetch_gql(`query ($id: ID!, $phone: String!){ verifyUser(id: $id, phone: $phone)${user_fields}}`, {id, phone});
   return result.data.verifyUser;
 }
