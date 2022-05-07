@@ -383,7 +383,7 @@ export async function initialize_state(db: Database, roomid: ObjectId) {
   let room = await db.rooms.findOne(filter);
   if(room === null){ return null; }
 
-  const num_players = room.players.length;
+  const num_players = Object.keys(room.players).length;
   const total_cards = room.settings.total_cards;
   const cards_per_hand = room.settings.cards_per_hand;
   
@@ -391,9 +391,9 @@ export async function initialize_state(db: Database, roomid: ObjectId) {
 
   const hands: {[key: string]: Hand} = {};
   let idx = 0;
-  for(const player_index in room.players){
-    const player = room.players[player_index];
-    hands[player] = initial_cards.slice(cards_per_hand*(idx), cards_per_hand*(idx+1));
+  for(const id in room.players){
+    const player = room.players[id];
+    hands[id] = initial_cards.slice(cards_per_hand*(idx), cards_per_hand*(idx+1));
     idx += 1;
   }
   const discard_stack = initial_cards.slice(-1);
