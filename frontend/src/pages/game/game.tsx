@@ -10,12 +10,12 @@ import {
 
 import {
   Waiting,
-  Ordering,
   Playing,
   Finished,
 } from '.';
 
 import {
+  useConnection,
   useRoom,
   useTabUser as useUser,
 } from '../../hooks';
@@ -23,14 +23,41 @@ import {
 export const GameContext = React.createContext({room: undefined, user: undefined});
 
 export default () => {
-  const [room, join, leave] = useRoom();
+  const [connected, {connect, disconnect, associate}] = useConnection(handleConnectionEvent);
+  const [room, join, check, leave] = useRoom();
   const [user, sign_in, sign_out] = useUser();
   const { tag } = useParams();
 
-  // make sure the room is joined
+  // open connection + ask for room
   useEffect(() => {
-    join(tag)
+    connect();
+    join(tag);
+    return function cleanup () {
+      disconnect();
+    }
   }, []);
+
+  // make sure the server knows who we are
+  useEffect(() => {
+    // const userid = (user == null) 
+
+    if(connected){
+      const args: any = {};
+      if(user !== null){
+        args.userid = user._id.toString();
+      }
+      if(room !== null){
+        args.roomid = room._id.toString();
+      }
+      associate(args);
+    }
+    
+  }, [user, room])
+
+  // handle signals from the connection
+  function handleConnectionEvent (event) {
+    check(); // check room for updates (signalled by this event on websocket)
+  }
 
   if(!room){
     return <>loading</>

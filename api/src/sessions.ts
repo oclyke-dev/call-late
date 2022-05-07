@@ -9,13 +9,14 @@ import {
 
 import {
   delete_room,
+  remove_player_from_room,
 } from '../../backend/src';
 
 import {
   db,
 } from '.';
 
-type ExtendedWebSocket = WebSocket & {isAlive?: boolean, roomid?: string};
+type ExtendedWebSocket = WebSocket & {isAlive?: boolean, roomid?: string, userid?: string};
 type Clients = ExtendedWebSocket[]
 type Session = {clients: Clients}
 type Sessions = { [key: string]: Session }
@@ -35,6 +36,15 @@ const unregister = async (ws: ExtendedWebSocket) => {
     const index = list.indexOf(ws);
     if (index > -1) {
       list.splice(index, 1);
+
+      // handle the disconnection from the game's perspective
+      if(typeof ws.roomid !== 'undefined'){
+        if(typeof ws.userid !== 'undefined'){
+          await remove_player_from_room(db, new ObjectId(ws.roomid), new ObjectId(ws.userid));
+        }
+        await notify_room(ws.roomid);
+      }
+
       if (list.length === 0) {
         console.warn('at this point the database should have the current session removed');
 
@@ -52,16 +62,20 @@ const unregister = async (ws: ExtendedWebSocket) => {
   }
 };
 
-const register = async (ws: ExtendedWebSocket, id: string) => {
-  // eslint-disable-next-line no-param-reassign
-  ws.roomid = id; // associate tag with this client
+const register = async (ws: ExtendedWebSocket, roomid: string, userid: string) => {
+  if(typeof roomid !== 'undefined'){
+    ws.roomid = roomid; // associate tag with this client
+  }
+  if(typeof userid !== 'undefined'){
+    ws.userid = userid;
+  }
 
-  if (typeof sessions[id] === 'undefined') {
-    sessions[id] = {
+  if (typeof sessions[roomid] === 'undefined') {
+    sessions[roomid] = {
       clients: [],
     };
   }
-  const { clients } = sessions[id];
+  const { clients } = sessions[roomid];
   if (!clients.includes(ws)) {
     clients.push(ws);
   }
@@ -75,11 +89,10 @@ export function start_wss(wss: WebSocketServer){
     });
     ws.on('close', () => { unregister(ws); });
     ws.on('message', (message) => {
-      const id = message.toString();
-
-      console.log('client registering with id: ', id);
-
-      register(ws, id);
+      const args = JSON.parse(message.toString());
+      const {roomid, userid} = args;
+      console.log('client registering with: ', args);
+      register(ws, roomid, userid);
     });
   });
 
