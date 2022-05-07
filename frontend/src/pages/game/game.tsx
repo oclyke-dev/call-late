@@ -39,9 +39,8 @@ export default () => {
       <GameContext.Provider value={{room, user}}>
 
         {room.phase === 0 && <Waiting />}
-        {room.phase === 1 && <Ordering />}
-        {room.phase === 2 && <Playing />}
-        {room.phase === 3 && <Finished />}
+        {room.phase === 1 && <Playing />}
+        {room.phase === 2 && <Finished />}
 
       </GameContext.Provider>
 

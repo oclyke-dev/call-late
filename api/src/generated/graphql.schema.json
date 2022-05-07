@@ -563,6 +563,16 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "PlayerEntryDict",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "Query",
         "description": null,
@@ -806,17 +816,9 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
-                    "ofType": null
-                  }
-                }
+                "kind": "SCALAR",
+                "name": "PlayerEntryDict",
+                "ofType": null
               }
             },
             "isDeprecated": false,

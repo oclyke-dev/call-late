@@ -13,8 +13,6 @@ import {
   verify_user,
   GamePhase,
   advance_room_phase,
-  add_user_to_order,
-  remove_user_from_order,
   change_settings,
   reset_room,
 } from '../../backend/src';
@@ -73,16 +71,16 @@ export const resolvers: any = {
       room !== null && await notify_room(room._id.toString());
       return room;
     },
-    addPlayerToOrder: async (parent: any, args: any) => {
-      const room = await add_user_to_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
-      room !== null && await notify_room(room._id.toString());
-      return room;
-    },
-    removePlayerFromOrder: async (parent: any, args: any) => {
-      const room = await remove_user_from_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
-      room !== null && await notify_room(room._id.toString());
-      return room;
-    },
+    // addPlayerToOrder: async (parent: any, args: any) => {
+    //   const room = await add_user_to_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+    //   room !== null && await notify_room(room._id.toString());
+    //   return room;
+    // },
+    // removePlayerFromOrder: async (parent: any, args: any) => {
+    //   const room = await remove_user_from_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+    //   room !== null && await notify_room(room._id.toString());
+    //   return room;
+    // },
     startTurn: async (parent: any, args: any) => {
       const room = await start_turn(db, new ObjectId(args.room_id), new ObjectId(args.user_id), args.card_source);
       room !== null && await notify_room(room._id.toString());

@@ -44,7 +44,7 @@ export default () => {
     }
   }, [room]);
 
-  if(user && !room.players.includes(user._id.toString())){
+  if(user && !Object.keys(room.players).includes(user._id.toString())){
     fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
   }
 
@@ -64,7 +64,7 @@ export default () => {
               {...provided.droppableProps}
             >
               <Holder>
-                {room.players.map((player, idx) => {
+                {Object.keys(room.players).map((player, idx) => {
                   return <React.Fragment key={`player.${player}`}>
                     <Draggable draggableId={player} index={idx}>
                       {(provided) => (

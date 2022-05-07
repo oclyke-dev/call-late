@@ -1,4 +1,5 @@
 scalar IntArrayDict
+scalar PlayerEntryDict
 
 type Query {
   getRoomById(id: ID!): Room
@@ -49,7 +50,7 @@ type Room {
   tag: String!
   discard_stack: [Int!]!
   hands: IntArrayDict
-  players: [ID!]!
+  players: PlayerEntryDict!
   phase: Int
   ordered: [ID!]!
   turn: Turn

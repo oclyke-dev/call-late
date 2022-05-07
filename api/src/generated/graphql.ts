@@ -13,6 +13,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   IntArrayDict: any;
+  PlayerEntryDict: any;
 };
 
 export type AdditionalEntityFields = {
@@ -138,7 +139,7 @@ export type Room = {
   hands: Maybe<Scalars['IntArrayDict']>;
   ordered: Array<Scalars['ID']>;
   phase: Maybe<Scalars['Int']>;
-  players: Array<Scalars['ID']>;
+  players: Scalars['PlayerEntryDict'];
   settings: Maybe<Settings>;
   tag: Scalars['String'];
   turn: Maybe<Turn>;
@@ -244,6 +245,7 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  PlayerEntryDict: ResolverTypeWrapper<Scalars['PlayerEntryDict']>;
   Query: ResolverTypeWrapper<{}>;
   Room: ResolverTypeWrapper<Room>;
   Settings: ResolverTypeWrapper<Settings>;
@@ -260,6 +262,7 @@ export type ResolversParentTypes = {
   Mutation: {};
   ID: Scalars['ID'];
   Int: Scalars['Int'];
+  PlayerEntryDict: Scalars['PlayerEntryDict'];
   Query: {};
   Room: Room;
   Settings: Settings;
@@ -334,6 +337,10 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   startTurn: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationStartTurnArgs, 'card_source' | 'room_id' | 'user_id'>>;
 };
 
+export interface PlayerEntryDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PlayerEntryDict'], any> {
+  name: 'PlayerEntryDict';
+}
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getRoomById: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByIdArgs, 'id'>>;
   getRoomByTag: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByTagArgs, 'tag'>>;
@@ -347,7 +354,7 @@ export type RoomResolvers<ContextType = any, ParentType extends ResolversParentT
   hands: Resolver<Maybe<ResolversTypes['IntArrayDict']>, ParentType, ContextType>;
   ordered: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   phase: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  players: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  players: Resolver<ResolversTypes['PlayerEntryDict'], ParentType, ContextType>;
   settings: Resolver<Maybe<ResolversTypes['Settings']>, ParentType, ContextType>;
   tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   turn: Resolver<Maybe<ResolversTypes['Turn']>, ParentType, ContextType>;
@@ -382,6 +389,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 export type Resolvers<ContextType = any> = {
   IntArrayDict: GraphQLScalarType;
   Mutation: MutationResolvers<ContextType>;
+  PlayerEntryDict: GraphQLScalarType;
   Query: QueryResolvers<ContextType>;
   Room: RoomResolvers<ContextType>;
   Settings: SettingsResolvers<ContextType>;
