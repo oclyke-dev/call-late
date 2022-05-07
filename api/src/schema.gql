@@ -14,8 +14,7 @@ type Mutation {
   addPlayerToRoom(room_id: ID!, user_id: ID!): Room
   startGame(room_id: ID!): Room
   resetRoom(room_id: ID!, tag: String!): Room
-  addPlayerToOrder(room_id: ID!, user_id: ID!): Room
-  removePlayerFromOrder(room_id: ID!, user_id: ID!): Room
+  setPlayerOrders(room_id: ID!, user_id: ID!, ordered: [ID!]!): Room
   startTurn(room_id: ID!, user_id: ID!, card_source: Int!): Room
   finishTurn(room_id: ID!, user_id: ID!, swap_index: Int): Room
   addPhoneNumberToUser(id: ID!, phone: String!): User

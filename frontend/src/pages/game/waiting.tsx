@@ -30,8 +30,25 @@ export default () => {
   
   const [settings, setSettings] = useState<{total_cards: string | number, cards_per_hand: string | number}>({total_cards: 0, cards_per_hand: 0})
 
-  function onDragEnd (result) {
-    console.log(result)
+  async function onDragEnd (result) {
+    const {destination, source, draggableId} = result;
+    
+    if(!destination){
+      return;
+    }
+
+    if(
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    
+    const ordered = [...room.ordered];
+    ordered.splice(source.index, 1);
+    ordered.splice(destination.index, 0, draggableId);
+
+    await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $ordered: [ID!]!){ setPlayerOrders(room_id: $room_id, user_id: $user_id, ordered: $ordered){ _id tag phase players }}`, {room_id: room._id, user_id: user._id, ordered});
   }
 
   // sync settings with game state
@@ -64,7 +81,7 @@ export default () => {
               {...provided.droppableProps}
             >
               <Holder>
-                {Object.keys(room.players).map((player, idx) => {
+                {room.ordered.map((player, idx) => {
                   return <React.Fragment key={`player.${player}`}>
                     <Draggable draggableId={player} index={idx}>
                       {(provided) => (

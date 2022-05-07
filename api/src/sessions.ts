@@ -22,6 +22,10 @@ type Session = {clients: Clients}
 type Sessions = { [key: string]: Session }
 export const sessions: Sessions = {};
 export const notify_room = async (room_id: string): Promise<void> => {
+  const session = sessions[room_id];
+  if(typeof session === 'undefined'){
+    return;
+  }
   const { clients } = sessions[room_id];
   clients.forEach((ws) => ws.send('refresh'));
 };

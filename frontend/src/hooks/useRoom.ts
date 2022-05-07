@@ -74,6 +74,9 @@ export function useRoom(): [Room | null, (tag: string) => void, () => void, () =
   }
 
   function check () {
+    if(!id.current){
+      return;
+    }
     get_room(id.current)
     .then(result => {
       setRoom(result);

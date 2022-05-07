@@ -24,15 +24,14 @@ export type AdditionalEntityFields = {
 export type Mutation = {
   __typename?: 'Mutation';
   addPhoneNumberToUser: Maybe<User>;
-  addPlayerToOrder: Maybe<Room>;
   addPlayerToRoom: Maybe<Room>;
   changeCardsPerHand: Maybe<Room>;
   changeTotalCards: Maybe<Room>;
   createRoom: Maybe<Scalars['ID']>;
   createUser: Maybe<Scalars['ID']>;
   finishTurn: Maybe<Room>;
-  removePlayerFromOrder: Maybe<Room>;
   resetRoom: Maybe<Room>;
+  setPlayerOrders: Maybe<Room>;
   startGame: Maybe<Room>;
   startTurn: Maybe<Room>;
 };
@@ -41,12 +40,6 @@ export type Mutation = {
 export type MutationAddPhoneNumberToUserArgs = {
   id: Scalars['ID'];
   phone: Scalars['String'];
-};
-
-
-export type MutationAddPlayerToOrderArgs = {
-  room_id: Scalars['ID'];
-  user_id: Scalars['ID'];
 };
 
 
@@ -80,15 +73,16 @@ export type MutationFinishTurnArgs = {
 };
 
 
-export type MutationRemovePlayerFromOrderArgs = {
-  room_id: Scalars['ID'];
-  user_id: Scalars['ID'];
-};
-
-
 export type MutationResetRoomArgs = {
   room_id: Scalars['ID'];
   tag: Scalars['String'];
+};
+
+
+export type MutationSetPlayerOrdersArgs = {
+  ordered: Array<Scalars['ID']>;
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
 };
 
 
@@ -324,15 +318,14 @@ export interface IntArrayDictScalarConfig extends GraphQLScalarTypeConfig<Resolv
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addPhoneNumberToUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationAddPhoneNumberToUserArgs, 'id' | 'phone'>>;
-  addPlayerToOrder: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToOrderArgs, 'room_id' | 'user_id'>>;
   addPlayerToRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToRoomArgs, 'room_id' | 'user_id'>>;
   changeCardsPerHand: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationChangeCardsPerHandArgs, 'cards_per_hand' | 'room_id'>>;
   changeTotalCards: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationChangeTotalCardsArgs, 'room_id' | 'total_cards'>>;
   createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
   createUser: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   finishTurn: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationFinishTurnArgs, 'room_id' | 'user_id'>>;
-  removePlayerFromOrder: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationRemovePlayerFromOrderArgs, 'room_id' | 'user_id'>>;
   resetRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationResetRoomArgs, 'room_id' | 'tag'>>;
+  setPlayerOrders: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationSetPlayerOrdersArgs, 'ordered' | 'room_id' | 'user_id'>>;
   startGame: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationStartGameArgs, 'room_id'>>;
   startTurn: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationStartTurnArgs, 'card_source' | 'room_id' | 'user_id'>>;
 };

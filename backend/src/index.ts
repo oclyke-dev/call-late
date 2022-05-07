@@ -20,6 +20,7 @@ export {
   delete_room,
   add_player_to_room,
   remove_player_from_room,
+  set_players_order,
   advance_room_phase,
   change_settings,
   reset_room,

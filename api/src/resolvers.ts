@@ -7,6 +7,7 @@ import {
   create_room,
   get_room_by_tag,
   add_player_to_room,
+  set_players_order,
   create_user,
   get_user,
   associate_user_phone_number,
@@ -71,16 +72,12 @@ export const resolvers: any = {
       room !== null && await notify_room(room._id.toString());
       return room;
     },
-    // addPlayerToOrder: async (parent: any, args: any) => {
-    //   const room = await add_user_to_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
-    //   room !== null && await notify_room(room._id.toString());
-    //   return room;
-    // },
-    // removePlayerFromOrder: async (parent: any, args: any) => {
-    //   const room = await remove_user_from_order(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
-    //   room !== null && await notify_room(room._id.toString());
-    //   return room;
-    // },
+    setPlayerOrders: async (parent: any, args: any) => {
+      const ordered = args.ordered.map((id: any) => (new ObjectId(id)));
+      const room = await set_players_order(db, new ObjectId(args.room_id), ordered);
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
     startTurn: async (parent: any, args: any) => {
       const room = await start_turn(db, new ObjectId(args.room_id), new ObjectId(args.user_id), args.card_source);
       room !== null && await notify_room(room._id.toString());

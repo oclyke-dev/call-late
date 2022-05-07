@@ -51,6 +51,7 @@ export default () => {
       }
       associate(args);
     }
+    check();
     
   }, [user, room])
 
