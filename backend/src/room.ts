@@ -10,6 +10,7 @@ import {
   Turn,
   CardSource,
   Settings,
+  PlayerEntry,
   increment_user_game_count,
   increment_user_win_count,
 } from '.';
@@ -32,20 +33,21 @@ const default_settings: Settings = {
   cards_per_hand: 10,
 }
 if(process.env.NODE_ENV === 'development'){
-  default_settings.cards_per_hand = 3;
+  default_settings.cards_per_hand = 6;
 }
 
 function make_room(tag: string): Room {
   return {
     tag,
     discard_stack: [],
-    players:[],
+    players:{},
     ordered: [],
     phase: 0,
     hands: {},
     turn: initial_turn,
     settings: default_settings,
-    winner: null
+    winner: null,
+    initialized: false,
   };
 }
 
@@ -73,24 +75,89 @@ export async function reset_room(db: Database, roomid: ObjectId, tag: string) {
 }
 
 export async function add_player_to_room(db: Database, roomid: ObjectId, userid: ObjectId) {
+  const idstring = userid.toString();
+  const filter: any = {
+    _id: roomid,
+    phase: {$lte: GamePhase.WAITING}, // ensure that players can only be added when the game is waiting
+    [`players.${idstring}`]: {$exists: false},
+  };
+  const entry: PlayerEntry = {
+    order: 0,
+  }
+  const {value} = await db.rooms.findOneAndUpdate(filter, {$set: {[`players.${idstring}`]: entry}}, {returnDocument: 'after'});
+  if(value === null){ return null; }
+  return await set_players_order(db, roomid, []);
+}
+
+export async function remove_player_from_room(db: Database, roomid: ObjectId, userid: ObjectId) {
+  const removeid = userid.toString();
+
+  // players can be removed from a gam at any time
   const filter = {
     _id: roomid,
-    phase: {$lte: GamePhase.WAITING} // ensure that players can only be added when the game is waiting
+    [`players.${removeid}`]: {$exists: true},
   };
-  const {value} = await db.rooms.findOneAndUpdate(filter, {$addToSet: {players: userid.toString()}}, {returnDocument: 'after'});
+  const room = await db.rooms.findOne(filter);
+  if(room === null){ return null; }
+
+  // rebuild the list of players
+  // make sure to remove this player from the ordered array also
+  const prevordered = [...room.ordered];
+  const unordered = Object.keys(room.players).filter(id => (!prevordered.includes(id)));
+  const ordered = [...prevordered, ...unordered].filter(id => (id !== removeid));
+
+  const players: {[key: string]: PlayerEntry} = {};
+  ordered.forEach((id, idx) => {
+    players[id] = {...room.players[id], order: idx};
+  });
+
+  // make sure to check the current turn to make sure other players can continue to play
+  const turn = {...room.turn};
+  if(turn.user && turn.index){
+    
+    if(turn.user === removeid){
+      // if removing the player whose turn it currently is:
+      let next_idx = turn.index + 1; // advance to the next user
+      if(next_idx >= ordered.length){
+        next_idx = 0;
+      }
+      turn.index = next_idx;
+      turn.user = ordered[next_idx];
+    } else {
+      // if removing some other player
+      const next_player = turn.user;
+      const next_idx = ordered.indexOf(next_player);
+      if(next_idx < 0){
+        throw new Error('expected to find index of next player');
+      }
+      turn.index = next_idx;
+    }
+
+  }
+
+  // make the actual update
+  const update = {
+    $set: {
+      turn,
+      players,
+      ordered,
+    }
+  };
+  const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
   return value;
 }
 
 export async function advance_room_phase(db: Database, roomid: ObjectId) {
-  const {value} = await db.rooms.findOneAndUpdate({_id: roomid}, {$inc: {phase: 1}}, {returnDocument: 'after'});
+  const {value} = await db.rooms.findOneAndUpdate({_id: roomid, phase: {$lt: GamePhase.FINISHED}}, {$inc: {phase: 1}}, {returnDocument: 'after'});
   if(value === null){ return null; }
 
   // handle special actions on phase transititions
   if (value.phase === GamePhase.PLAYING){
-    const room = await go_to_next_turn(db, value._id);
-    for(const id of value.players){
+    let room = await initialize_state(db, roomid);
+    room = await go_to_next_turn(db, value._id);
+    await Promise.all(Object.keys(value.players).map(async (id) => {
       await increment_user_game_count(db, new ObjectId(id));
-    }
+    }));
     return room;
   }
   if (value.phase === GamePhase.FINISHED){
@@ -100,29 +167,28 @@ export async function advance_room_phase(db: Database, roomid: ObjectId) {
   return value;
 }
 
-export async function add_user_to_order(db: Database, roomid: ObjectId, userid: ObjectId) {
+export async function set_players_order(db: Database, roomid: ObjectId, orderedids: ObjectId[]) {
+  // note: if the ordered ids do not include all players then unlisted players are randomly assigned an order after ordered players
   const filter = {
-    _id: roomid,
-    phase: GamePhase.ORDERING, // only valid during ordering phase
-    players: {$all: [userid.toString()]}, // only operate on rooms which have this player in the players list
-    ordered: {$nin: [userid.toString()]}, // don't add the player if they are already in the player's list
+    _id: roomid, phase: GamePhase.WAITING
   };
-  let {value} = await db.rooms.findOneAndUpdate(filter, {$push: {ordered: userid.toString()}}, {returnDocument: 'after'});
-  if((value !== null) && (value.ordered.length === value.players.length)){
-    await initialize_state(db, roomid);
-    return await advance_room_phase(db, roomid);
-  }
-  return value;
-}
+  const room = await db.rooms.findOne(filter);
+  if(room === null){ return null; }
 
-export async function remove_user_from_order(db: Database, roomid: ObjectId, userid: ObjectId) {
-  const filter = {
-    _id: roomid,
-    phase: GamePhase.ORDERING, // only valid during ordering phase
-    players: {$all: [userid.toString()]}, // only operate on rooms which have this player in the players list
-    ordered: {$all: [userid.toString()]}, // only remove the player if they are already in the ordered list
+  const ordered_strings = orderedids.map(id => id.toString());
+  const unordered_players = Object.keys(room.players).filter(id => (!ordered_strings.includes(id)));
+  const final_order = [...ordered_strings, ...unordered_players];
+
+  const update: any = {
+    $set: {
+      ordered: final_order,
+    }
   };
-  const {value} = await db.rooms.findOneAndUpdate(filter, {$pull: {ordered: userid.toString()}}, {returnDocument: 'after'});
+  final_order.forEach((id, idx) => {
+    update.$set[`players.${id}.order`] = idx;
+  });
+
+  const {value} = await db.rooms.findOneAndUpdate({_id: roomid}, update, {returnDocument: 'after'});
   return value;
 }
 
@@ -132,7 +198,11 @@ export async function initialize_turn_state(db: Database, room_id: ObjectId) {
 }
 
 export async function go_to_next_turn(db: Database, roomid: ObjectId) {
-  const room = await get_room(db, roomid);
+  const filter = {
+    _id: roomid,
+    phase: GamePhase.PLAYING, // game must be in playing state
+  }
+  const room = await db.rooms.findOne(filter);
   if(room === null){ return null; }
   
   // get the next turn index
@@ -142,17 +212,12 @@ export async function go_to_next_turn(db: Database, roomid: ObjectId) {
   } else {
     next_idx = room.turn.index + 1;
   }
-  if(next_idx >= room.players.length){
+  if(next_idx >= room.ordered.length){
     next_idx = 0;
   }
   const next_user = room.ordered[next_idx];
   const new_turn = {...initial_turn, user: next_user, index: next_idx};
   const update = { $set: { turn: new_turn} };
-
-  const filter = {
-    _id: roomid,
-    phase: GamePhase.PLAYING, // game must be in playing state
-  }
 
   const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
   return value;
@@ -162,6 +227,8 @@ export async function start_turn(db: Database, roomid: ObjectId, userid: ObjectI
   // player picks up a card from either the DISCARD or the RESERVE
   // (discard comes from the stack, RESERVE can generate a random card value that doesn't include any in the stack or player's hands)
   
+
+
   const filter = {
     _id: roomid,
     phase: GamePhase.PLAYING,
@@ -310,7 +377,7 @@ export async function change_settings(db: Database, roomid: ObjectId, settings: 
 export async function initialize_state(db: Database, roomid: ObjectId) {
   const filter = {
     _id: roomid,
-    phase: GamePhase.ORDERING,
+    initialized: false, // room must not have been initialized yet
   };
   
   let room = await db.rooms.findOne(filter);
@@ -331,7 +398,7 @@ export async function initialize_state(db: Database, roomid: ObjectId) {
   }
   const discard_stack = initial_cards.slice(-1);
 
-  const result = await db.rooms.findOneAndUpdate(filter, {$set: {discard_stack, hands}}, {returnDocument: 'after'});
+  const result = await db.rooms.findOneAndUpdate(filter, {$set: {discard_stack, hands, initialized: true}}, {returnDocument: 'after'});
   room = result.value;
 
   return room;

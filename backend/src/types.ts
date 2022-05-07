@@ -8,7 +8,6 @@ export type ID = string
 export type Hand = Array<number>
 export enum GamePhase {
   WAITING,
-  ORDERING,
   PLAYING,
   FINISHED,
 }
@@ -37,16 +36,21 @@ export type Settings = {
   cards_per_hand: number
 }
 
+export type PlayerEntry = {
+  order: number,
+}
+
 export type Room = OptionalId<{
   tag: string
   discard_stack: Array<number>
   hands: {[key: string]: Hand}
-  players: Array<ID>
+  players: {[key: string]: PlayerEntry}
   phase: GamePhase
   ordered: Array<ID>
   turn: Turn
   settings: Settings
   winner: ID | null
+  initialized: boolean
 }>
 
 export interface Database {

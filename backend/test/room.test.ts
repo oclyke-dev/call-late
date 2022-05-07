@@ -16,18 +16,18 @@ import {
   create_room,
   create_user,
   add_player_to_room,
+  remove_player_from_room,
   advance_room_phase,
-  add_user_to_order,
-  remove_user_from_order,
   get_room_by_tag,
   delete_room,
+  CardSource,
 } from '../src';
 
 import {
   start_server,
   shuffle,
 } from '../src/utils';
-import { finish_turn, start_turn } from '../src/room';
+import { finish_turn, set_players_order, start_turn } from '../src/room';
 
 let db: Database
 let client: MongoClient;
@@ -87,7 +87,14 @@ test('rooms can be deleted', async () => {
 test('players can be added during waiting phase', async () => {
   const playerid = new ObjectId();
   const roomid = await create_room(db, room_tag);
-  await expect(add_player_to_room(db, roomid, playerid)).resolves.toHaveProperty('players', [playerid.toString()]);
+  await expect(add_player_to_room(db, roomid, playerid)).resolves.toHaveProperty(`players.${playerid.toString()}`, {order: 0});
+});
+
+test('players cant join a room twice', async () => {
+  const playerid = new ObjectId();
+  const roomid = await create_room(db, room_tag);
+  await add_player_to_room(db, roomid, playerid);
+  await expect(add_player_to_room(db, roomid, playerid)).resolves.toBeNull();
 });
 
 test('two identical tags to fail', async () => {
@@ -98,16 +105,14 @@ test('two identical tags to fail', async () => {
 test('room phase increments properly', async () => {
   const roomid = await create_room(db, room_tag);
   await expect(get_room(db, roomid)).resolves.toHaveProperty('phase', GamePhase.WAITING);
-  await expect(advance_room_phase(db, roomid)).resolves.toHaveProperty('phase', GamePhase.ORDERING);
   await expect(advance_room_phase(db, roomid)).resolves.toHaveProperty('phase', GamePhase.PLAYING);
   await expect(advance_room_phase(db, roomid)).resolves.toHaveProperty('phase', GamePhase.FINISHED);
+  await expect(advance_room_phase(db, roomid,)).resolves.toBeNull(); // room phase cannot be advanced past finished
 })
 
 test('users cant join games that are playing or finished', async () => {
   const roomid = await create_room(db, room_tag);
   const playerid = await create_user(db);
-  await advance_room_phase(db, roomid); // advance to 'ORDERING'
-  await expect(add_player_to_room(db, roomid, playerid)).resolves.toBeNull();
   await advance_room_phase(db, roomid); // advance to 'PLAYING'
   await expect(add_player_to_room(db, roomid, playerid)).resolves.toBeNull();
   await advance_room_phase(db, roomid); // advance to 'FINISHED'
@@ -121,39 +126,37 @@ test('setting the order of players', async () => {
     return create_user(db);
   }));
   await Promise.all(userids.map(async id => add_player_to_room(db, roomid, id)));
-  await advance_room_phase(db, roomid);
-  const orders = shuffle(userids.map((_, idx) => idx));
-  let result;
-  for (const idx of orders) {
-    result = await add_user_to_order(db, roomid, userids[idx])
-  }
-  expect(result).toHaveProperty('ordered', orders.map(idx => userids[idx].toString()));
-  expect(result).toHaveProperty('phase', GamePhase.PLAYING); // adding all players to order begins play
+  const orderedids = shuffle(userids);
+  const result = await set_players_order(db, roomid, orderedids);
+  expect(result).toHaveProperty('ordered', orderedids.map(id => id.toString()));
 });
 
-test('setting order outside ORDERING phase', async () => {
+test('setting order outside WAITING phase', async () => {
   const roomid = await create_room(db, room_tag);
   const userid = await create_user(db);
-  await expect(add_user_to_order(db, roomid, userid)).resolves.toBeNull();
-  await advance_room_phase(db, roomid); // ORDERING
+  await add_player_to_room(db, roomid, userid);
+  await expect(set_players_order(db, roomid, [])).resolves.toHaveProperty('ordered', [userid.toString()]);
   await advance_room_phase(db, roomid); // PLAYING
-  await expect(add_user_to_order(db, roomid, userid)).resolves.toBeNull();
+  await expect(set_players_order(db, roomid, [])).resolves.toBeNull();
   await advance_room_phase(db, roomid); // FINISHED
-  await expect(add_user_to_order(db, roomid, userid)).resolves.toBeNull();
+  await expect(set_players_order(db, roomid, [])).resolves.toBeNull();
 });
 
-test('pulling players out of the order', async () => {
+test('removing players from the game', async () => {
   const roomid = await create_room(db, room_tag);
   const userid = await create_user(db);
   const userid2 = await create_user(db);
   await add_player_to_room(db, roomid, userid);
   await add_player_to_room(db, roomid, userid2);
-  await advance_room_phase(db, roomid); // ORDERING
-  await expect(add_user_to_order(db, roomid, userid)).resolves.toHaveProperty('ordered', [userid.toString()]);
-  await expect(remove_user_from_order(db, roomid, userid)).resolves.toHaveProperty('ordered', []);
-  await expect(add_user_to_order(db, roomid, userid2)).resolves.toHaveProperty('ordered', [userid2.toString()]);
-  const final = await add_user_to_order(db, roomid, userid);
-  expect(final).toHaveProperty('ordered', [userid2.toString(), userid.toString()]);
+  await expect(set_players_order(db, roomid, [userid2, userid])).resolves.toHaveProperty('ordered', [userid2.toString(), userid.toString()]);
+  
+  let result = await remove_player_from_room(db, roomid, userid2);
+  expect(result).toHaveProperty('ordered', [userid.toString()]);
+  expect(result).toHaveProperty('players', {[`${userid.toString()}`]: {order: 0}});
+
+  result = await remove_player_from_room(db, roomid, userid);
+  expect(result).toHaveProperty('ordered', []);
+  expect(result).toHaveProperty('players', {});
 });
 
 test('advancing the turn should work right', async () => {
@@ -162,10 +165,16 @@ test('advancing the turn should work right', async () => {
   const userid2 = await create_user(db);
   await add_player_to_room(db, roomid, userid);
   await add_player_to_room(db, roomid, userid2);
-  await advance_room_phase(db, roomid); // ORDERING
-  await add_user_to_order(db, roomid, userid);
-  await add_user_to_order(db, roomid, userid2);
-  await expect(get_room(db, roomid)).resolves.toHaveProperty('phase', GamePhase.PLAYING);
-  await start_turn(db, roomid, userid, 0);
-  await expect(finish_turn(db, roomid, userid, null)).resolves.toHaveProperty('turn.index', 1);
+  await set_players_order(db, roomid, [userid, userid2]);
+  await expect(advance_room_phase(db, roomid)).resolves.toHaveProperty('phase', GamePhase.PLAYING);
+
+  let result = await start_turn(db, roomid, userid, CardSource.DISCARD);
+  expect(result).toHaveProperty('turn.user', userid.toString());
+  expect(result).toHaveProperty('turn.index', 0);
+  expect(result).toHaveProperty('turn.source', CardSource.DISCARD);
+
+  result = await finish_turn(db, roomid, userid, null);
+  expect(result).toHaveProperty('turn.user', userid2.toString());
+  expect(result).toHaveProperty('turn.index', 1);
+  expect(result).toHaveProperty('turn.source', null);
 });

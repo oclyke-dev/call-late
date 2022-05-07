@@ -10,6 +10,7 @@ export {
   Turn,
   CardSource,
   Settings,
+  PlayerEntry,
 } from './types';
 
 export {
@@ -18,9 +19,8 @@ export {
   get_room_by_tag,
   delete_room,
   add_player_to_room,
+  remove_player_from_room,
   advance_room_phase,
-  add_user_to_order,
-  remove_user_from_order,
   change_settings,
   reset_room,
 } from './room';
