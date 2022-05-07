@@ -22,10 +22,6 @@ import {
 } from '../../components';
 
 import {
-  Room,
-} from '../../../../backend/src';
-
-import {
   GameContext,
 } from './game';
 
