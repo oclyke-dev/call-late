@@ -1,23 +1,18 @@
 import React from 'react';
 import {
-  useEffect,
-  useState,
+  useContext,
 } from 'react';
 
 import {
-  useUser,
-} from '../../hooks';
-
-import {
-  Room,
-} from '../../../../backend/src';
+  GameContext,
+} from './game';
 
 import {
   fetch_gql
 } from '../../utils';
 
-export default (props: {room: Room}) => {
-  const room = props.room;
+export default () => {
+  const {room, user} = useContext(GameContext);
 
   console.log(room)
 

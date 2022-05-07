@@ -1,24 +1,18 @@
-import React from 'react';
 import {
-  useEffect,
-  useState,
+  default as React,
+  useContext,
 } from 'react';
-
-import {
-  useUser,
-} from '../../hooks';
 
 import {
   fetch_gql,
 } from '../../utils';
 
 import {
-  Room,
-} from '../../../../backend/src';
+  GameContext,
+} from './game';
 
-export default (props: {room: Room}) => {
-  const [user] = useUser();
-  const room = props.room;
+export default () => {
+  const {room, user} = useContext(GameContext);
 
   const in_order = (user && room.ordered.includes(user._id.toString()))
 

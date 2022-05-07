@@ -2,28 +2,18 @@ import React from 'react';
 import {
   useEffect,
   useState,
+  useContext,
 } from 'react';
 
 import {
   DragDropContext,
   Droppable,
   Draggable,
-
-  DraggableId,
 } from 'react-beautiful-dnd';
-
-import {
-  useParams,
-} from 'react-router-dom';
 
 import {
   fetch_gql,
 } from '../../utils';
-
-import {
-  useRoom,
-  useUser,
-} from '../../hooks';
 
 import {
   PlayerCard,
@@ -31,17 +21,18 @@ import {
   Sluice,
 } from '../../components';
 
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-
 import {
   Room,
 } from '../../../../backend/src';
 
-export default (props: {room: Room}) => {
+import {
+  GameContext,
+} from './game';
+
+export default () => {
+  const {room, user} = useContext(GameContext);
+  
   const [settings, setSettings] = useState<{total_cards: string | number, cards_per_hand: string | number}>({total_cards: 0, cards_per_hand: 0})
-  const [user, sign_in, sign_out] = useUser();
-  const room = props.room;
 
   function onDragEnd (result) {
     console.log(result)

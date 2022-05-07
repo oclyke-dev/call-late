@@ -17,10 +17,14 @@ import {
 
 import {
   useRoom,
+  useUser,
 } from '../../hooks';
+
+export const GameContext = React.createContext({room: undefined, user: undefined});
 
 export default () => {
   const [room, join, leave] = useRoom();
+  const [user, sign_in, sign_out] = useUser();
   const { tag } = useParams();
 
   // make sure the room is joined
@@ -32,21 +36,14 @@ export default () => {
     return <>loading</>
   } else {
     return <>
-      <Link to='/'>call-late</Link>
+      <GameContext.Provider value={{room, user}}>
 
-      {/* <div>
-        user info: 
-        <pre>{(user !== null) && JSON.stringify(user, null, 2)}</pre>
-      </div>
-      <div>
-        room info:
-        <pre>{(room !== null) && JSON.stringify(room, null, 2)}</pre>
-      </div> */}
+        {room.phase === 0 && <Waiting />}
+        {room.phase === 1 && <Ordering />}
+        {room.phase === 2 && <Playing />}
+        {room.phase === 3 && <Finished />}
 
-      {room.phase === 0 && <Waiting room={room}/>}
-      {room.phase === 1 && <Ordering room={room}/>}
-      {room.phase === 2 && <Playing room={room}/>}
-      {room.phase === 3 && <Finished room={room}/>}
+      </GameContext.Provider>
 
     </>
   }

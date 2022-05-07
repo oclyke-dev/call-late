@@ -1,30 +1,23 @@
-import React from 'react';
 import {
-  useEffect,
-  useState,
+  default as React,
+  useContext,
 } from 'react';
-
-import {
-  useRoom,
-  useUser,
-} from '../../hooks';
 
 import {
   fetch_gql,
 } from '../../utils';
 
 import {
-  Room,
-} from '../../../../backend/src';
+  GameContext,
+} from './game';
 
 // ugh this is not a cute look, but the enum def from the backend can't 
 // be used because of a disallowed MIME type whatever that means
 const DISCARD = 0;
 const RESERVE = 1;
 
-export default (props: {room: Room}) => {
-  const [user, sign_in, sign_out] = useUser();
-  const room = props.room;
+export default () => {
+  const {room, user} = useContext(GameContext);
 
   if(!user){
     return <>loading</>
@@ -48,7 +41,7 @@ export default (props: {room: Room}) => {
       </ React.Fragment>
     })}
 
-    {room && user && room.turn.user === user._id.toString() && <div style={{backgroundCOlor: 'green'}}>
+    {room && user && room.turn.user === user._id.toString() && <div style={{backgroundColor: 'green'}}>
       {room.turn.source === null && <div>
         <button
           disabled={room && user && room.turn.user !== user._id.toString()}

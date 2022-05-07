@@ -28,8 +28,6 @@ ReactDOM.render(
           <Route path=':tag' element={<Game />} />
           <Route index element={<Start />} />
         </Route>
-
-        
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
