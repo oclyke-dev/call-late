@@ -17,7 +17,7 @@ import {
 
 import {
   useRoom,
-  useUser,
+  useTabUser as useUser,
 } from '../../hooks';
 
 export const GameContext = React.createContext({room: undefined, user: undefined});

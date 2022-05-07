@@ -39,18 +39,26 @@ async function verify_user(id: string, phone: string): Promise<User | null> {
   return result.data.verifyUser;
 }
 
-export function useUser(): [(User | null), (id: string, phone: string) => void, () => void, (phone: string) => void] {
+type PersistantStorage = {
+  store: (val: string) => void,
+  load: () => string | null,
+  clear: () => void,
+}
+
+
+
+export function useUserCore(persistance: PersistantStorage): [(User | null), (id: string, phone: string) => void, () => void, (phone: string) => void] {
   const [nonce, setNonce] = useState(new Object());
   const [user, setUser] = useState<User | null>(null);
 
   // get the initial user either from local storage id 
   // or by creating a new user within the database
   useEffect(() => {
-    const localid = localStorage.getItem(user_id_key);
+    const localid = persistance.load();
     if(!localid){
       create_user()
       .then(id => {
-        localStorage.setItem(user_id_key, id);
+        persistance.store(id);
         return get_user(id);
       })
       .then(user => {
@@ -62,7 +70,7 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
       get_user(localid)
       .then(user => {
         if(user === null){
-          localStorage.clear(); // try to remedy this...
+          persistance.clear(); // try to remedy this...
           setNonce(new Object());
           return Promise.reject(`user with id: '${localid}' not found in database`);
         }
@@ -81,7 +89,7 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
         return Promise.reject('invalid credentials');
       }
       setUser(user);
-      localStorage.setItem(user_id_key, id);
+      persistance.store(id);
     })
     .catch(console.error);
   }
@@ -100,4 +108,27 @@ export function useUser(): [(User | null), (id: string, phone: string) => void, 
   }
 
   return [user, sign_in, sign_out, associate_phone];
+}
+
+// create a useUser hook that uses localstorage to maintain user between tabs
+export function useUser() {
+  const persistent_local_storage: PersistantStorage = {
+    store: (val: string) => { localStorage.setItem(user_id_key, val); },
+    load: () => { return localStorage.getItem(user_id_key); },
+    clear: () => { localStorage.clear(); },
+  }
+
+  return useUserCore(persistent_local_storage);
+}
+
+// create a useUser hook that uses a ref so that each application has its unique value
+export function useTabUser() {
+  const idref = useRef(null);
+  const persistant_ref_storage: PersistantStorage = {
+    store: (val: string) => { idref.current = val; },
+    load: () => { return idref.current; },
+    clear: () => { idref.current = null; },
+  }
+
+  return useUserCore(persistant_ref_storage);
 }
