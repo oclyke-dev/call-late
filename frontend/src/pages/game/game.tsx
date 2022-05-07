@@ -24,7 +24,7 @@ export default () => {
   const { tag } = useParams();
 
   // make sure the room is joined
-  useEffect(async () => {
+  useEffect(() => {
     join(tag)
   }, []);
 
