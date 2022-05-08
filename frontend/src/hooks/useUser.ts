@@ -80,10 +80,6 @@ export function useUserCore(persistance: PersistantStorage): [(User | null), (id
     }
   }, [nonce]);
 
-  function get () {
-
-  }
-
   function sign_in(id: string, phone: string) {
     // to sign in the database must confirm that the 
     // supplied phone number matches the desired user
