@@ -56,8 +56,8 @@ export const resolvers: any = {
       return id;
     },
     addPlayerToRoom: async (parent: any, args: any) => {
-      const room = await add_player_to_room(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
-      await set_player_playing(db, new ObjectId(args.room_id), new ObjectId(args.user_id), true);
+      let room = await add_player_to_room(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+      room = await set_player_playing(db, new ObjectId(args.room_id), new ObjectId(args.user_id), true);
       room !== null && await notify_room(room._id.toString());
       return room;
     },

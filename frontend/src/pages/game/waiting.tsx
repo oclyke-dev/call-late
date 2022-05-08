@@ -61,10 +61,6 @@ export default () => {
     }
   }, [room]);
 
-  if(user && !Object.keys(room.players).includes(user._id.toString())){
-    fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: user._id});
-  }
-
   return <>
     <Sluice>
 
