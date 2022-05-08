@@ -124,11 +124,11 @@ export function useUser() {
 // create a useUser hook that uses a ref so that each application has its unique value
 export function useTabUser() {
   const idref = useRef(null);
-  const persistant_ref_storage: PersistantStorage = {
-    store: (val: string) => { idref.current = val; },
-    load: () => { return idref.current; },
-    clear: () => { idref.current = null; },
+  const persistant_session_storage: PersistantStorage = {
+    store: (val: string) => { sessionStorage.setItem(user_id_key, val); },
+    load: () => { return sessionStorage.getItem(user_id_key); },
+    clear: () => { sessionStorage.clear(); },
   }
 
-  return useUserCore(persistant_ref_storage);
+  return useUserCore(persistant_session_storage);
 }
