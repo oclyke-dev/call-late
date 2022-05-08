@@ -87,7 +87,7 @@ test('rooms can be deleted', async () => {
 test('players can be added during waiting phase', async () => {
   const playerid = new ObjectId();
   const roomid = await create_room(db, room_tag);
-  await expect(add_player_to_room(db, roomid, playerid)).resolves.toHaveProperty(`players.${playerid.toString()}`, {order: 0});
+  await expect(add_player_to_room(db, roomid, playerid)).resolves.toHaveProperty(`players.${playerid.toString()}`, {order: 0, playing: true});
 });
 
 test('players cant join a room twice', async () => {
@@ -152,7 +152,7 @@ test('removing players from the game', async () => {
   
   let result = await remove_player_from_room(db, roomid, userid2);
   expect(result).toHaveProperty('ordered', [userid.toString()]);
-  expect(result).toHaveProperty('players', {[`${userid.toString()}`]: {order: 0}});
+  expect(result).toHaveProperty('players', {[`${userid.toString()}`]: {order: 0, playing: true}});
 
   result = await remove_player_from_room(db, roomid, userid);
   expect(result).toHaveProperty('ordered', []);

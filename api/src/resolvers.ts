@@ -7,6 +7,7 @@ import {
   create_room,
   get_room_by_tag,
   add_player_to_room,
+  set_player_playing,
   set_players_order,
   create_user,
   get_user,
@@ -56,6 +57,7 @@ export const resolvers: any = {
     },
     addPlayerToRoom: async (parent: any, args: any) => {
       const room = await add_player_to_room(db, new ObjectId(args.room_id), new ObjectId(args.user_id));
+      await set_player_playing(db, new ObjectId(args.room_id), new ObjectId(args.user_id), true);
       room !== null && await notify_room(room._id.toString());
       return room;
     },

@@ -9,7 +9,7 @@ import {
 
 import {
   delete_room,
-  remove_player_from_room,
+  set_player_playing,
 } from '../../backend/src';
 
 import {
@@ -44,7 +44,7 @@ const unregister = async (ws: ExtendedWebSocket) => {
       // handle the disconnection from the game's perspective
       if(typeof ws.roomid !== 'undefined'){
         if(typeof ws.userid !== 'undefined'){
-          await remove_player_from_room(db, new ObjectId(ws.roomid), new ObjectId(ws.userid));
+          await set_player_playing(db, new ObjectId(ws.roomid), new ObjectId(ws.userid), false);
         }
         await notify_room(ws.roomid);
       }

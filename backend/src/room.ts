@@ -83,10 +83,28 @@ export async function add_player_to_room(db: Database, roomid: ObjectId, userid:
   };
   const entry: PlayerEntry = {
     order: 0,
+    playing: true,
   }
   const {value} = await db.rooms.findOneAndUpdate(filter, {$set: {[`players.${idstring}`]: entry}}, {returnDocument: 'after'});
   if(value === null){ return null; }
   return await set_players_order(db, roomid, []);
+}
+
+export async function set_player_playing(db: Database, roomid: ObjectId, userid: ObjectId, playing: boolean) {
+  // allows players to be set as 'not playing' while leaving them in the game
+  // as opposed to totally removing them
+  const id = userid.toString();
+  const filter = {
+    _id: roomid,
+    [`players.${id}`]: {$exists: true },
+  };
+  const update = {
+    $set: {
+      [`players.${id}.playing`]: playing,
+    }
+  }
+  const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
+  return value;
 }
 
 export async function remove_player_from_room(db: Database, roomid: ObjectId, userid: ObjectId) {
@@ -197,6 +215,47 @@ export async function initialize_turn_state(db: Database, room_id: ObjectId) {
   return value;
 }
 
+async function get_next_turn (db: Database, roomid: ObjectId, room: Room): Promise<Turn> {
+  // sets up the next turn, taking into account peculiarities such as:
+  // * users may not actively be 'playing' (in which they are skipped)
+  // * if no users are playing then the game phase should advance
+
+  if(room.ordered.length === 0){
+    return initial_turn;
+  }
+
+  const original_index = room.turn.index;
+  let next_idx: number | null = room.turn.index;
+  let player_found = false;
+
+  for (let idx = 0; idx < room.ordered.length; idx++) {
+    if(next_idx === null){
+      next_idx = 0;
+    }else{
+      next_idx++;
+      if(next_idx >= room.ordered.length){
+        next_idx = 0;
+      }
+    }
+    const next_user = room.ordered[next_idx];
+    if(room.players[next_user].playing) {
+      player_found = true;
+      break;
+    }
+  }
+
+  if(!player_found || next_idx === null){
+    throw new Error('no players left to play!');
+    await advance_room_phase(db, roomid); // also possible to just end the game when this happens
+  }
+
+  return {
+    ...initial_turn,
+    user: room.ordered[next_idx],
+    index: next_idx,
+  };
+}
+
 export async function go_to_next_turn(db: Database, roomid: ObjectId) {
   const filter = {
     _id: roomid,
@@ -205,19 +264,8 @@ export async function go_to_next_turn(db: Database, roomid: ObjectId) {
   const room = await db.rooms.findOne(filter);
   if(room === null){ return null; }
   
-  // get the next turn index
-  let next_idx;
-  if(room.turn.index === null){
-    next_idx = 0;
-  } else {
-    next_idx = room.turn.index + 1;
-  }
-  if(next_idx >= room.ordered.length){
-    next_idx = 0;
-  }
-  const next_user = room.ordered[next_idx];
-  const new_turn = {...initial_turn, user: next_user, index: next_idx};
-  const update = { $set: { turn: new_turn} };
+  const next_turn = await get_next_turn(db, roomid, room);
+  const update = { $set: { turn: next_turn} };
 
   const {value} = await db.rooms.findOneAndUpdate(filter, update, {returnDocument: 'after'});
   return value;

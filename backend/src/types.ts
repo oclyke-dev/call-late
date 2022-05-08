@@ -38,6 +38,7 @@ export type Settings = {
 
 export type PlayerEntry = {
   order: number,
+  playing: boolean,
 }
 
 export type Room = OptionalId<{

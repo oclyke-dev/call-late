@@ -19,6 +19,7 @@ export {
   get_room_by_tag,
   delete_room,
   add_player_to_room,
+  set_player_playing,
   remove_player_from_room,
   set_players_order,
   advance_room_phase,
