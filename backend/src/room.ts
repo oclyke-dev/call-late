@@ -281,6 +281,7 @@ export async function start_turn(db: Database, roomid: ObjectId, userid: ObjectI
     _id: roomid,
     phase: GamePhase.PLAYING,
     'turn.user': userid.toString(),
+    'turn.source': null, // turn should not already be started
   }
 
   // get room info to compute new card value

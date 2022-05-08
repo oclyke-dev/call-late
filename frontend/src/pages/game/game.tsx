@@ -15,6 +15,11 @@ import {
 } from '.';
 
 import {
+  Room,
+  User
+} from '../../../../backend/src';
+
+import {
   useConnection,
   useRoom,
   useTabUser as useUser,

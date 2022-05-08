@@ -4,6 +4,7 @@ import {
 
 import Paper from '@mui/material/Paper';
 
+// todo: consider using the react render function pattern...?
 export function Card (props) {
   return <>
     <Paper
@@ -24,3 +25,10 @@ export function PlayerCard ({player}) {
   </>
 }
 
+export function NumberCard ({number, flipped = false}) {
+  return <>
+    <Card>
+      {(flipped) ? 'back of card' :  `${number}`}
+    </Card>
+  </>
+}

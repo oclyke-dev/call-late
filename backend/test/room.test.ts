@@ -178,3 +178,13 @@ test('advancing the turn should work right', async () => {
   expect(result).toHaveProperty('turn.index', 1);
   expect(result).toHaveProperty('turn.source', null);
 });
+
+test('cant start a turn that is already started', async () => {
+  const roomid = await create_room(db, room_tag);
+  const userid = await create_user(db);
+  await add_player_to_room(db, roomid, userid);
+  await expect(advance_room_phase(db, roomid)).resolves.toHaveProperty('phase', GamePhase.PLAYING);
+
+  await expect(start_turn(db, roomid, userid, CardSource.DISCARD)).resolves.toHaveProperty('turn.user', userid.toString());
+  await expect(start_turn(db, roomid, userid, CardSource.DISCARD)).resolves.toBeNull();
+});
