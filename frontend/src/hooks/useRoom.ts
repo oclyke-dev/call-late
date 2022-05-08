@@ -49,28 +49,31 @@ async function create_room(tag: string) {
   return result.data.createRoom;
 }
 
-export function useRoom(): [Room | null, (tag: string) => void, () => void, () => void] {
+export function useRoom(): [Room | null, (tag: string) => Promise<Room>, () => void, () => void] {
   const [room, setRoom] = useState<Room | null>(null);
   const id = useRef<string | null>(null);
 
   // try to join a room by a given tag
   const join = (tag: string) => {
-    get_room_by_tag(tag)
-    .then((existing) => {
-      if(existing === null){
-        return create_room(tag);
-      }else{
-        return Promise.resolve(existing._id);
-      }
-    })
-    .then(_id => {
-      id.current = _id; // keep track of the id in case it is needed again
-      return get_room(_id);
-    })
-    .then(room => {
-      setRoom(room);
-    })
-    .catch(console.error);
+    return new Promise((resolve, reject) => {
+      get_room_by_tag(tag)
+      .then((existing) => {
+        if(existing === null){
+          return create_room(tag);
+        }else{
+          return Promise.resolve(existing._id);
+        }
+      })
+      .then(_id => {
+        id.current = _id; // keep track of the id in case it is needed again
+        return get_room(_id);
+      })
+      .then(room => {
+        setRoom(room);
+        resolve(room);
+      })
+      .catch(reject);
+    });
   }
 
   function check () {

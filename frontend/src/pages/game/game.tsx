@@ -29,31 +29,18 @@ export default () => {
   const { tag } = useParams();
 
   // open connection + ask for room
+  const roomid = (room === null) ? undefined : room._id.toString();
+  const userid = (user === null) ? undefined : user._id.toString();
   useEffect(() => {
     connect();
-    join(tag);
+    join(tag)
+    .then(r => {
+      associate({roomid: r._id.toString(), userid});
+    })
     return function cleanup () {
       disconnect();
     }
-  }, []);
-
-  // make sure the server knows who we are
-  useEffect(() => {
-    // const userid = (user == null) 
-
-    if(connected){
-      const args: any = {};
-      if(user !== null){
-        args.userid = user._id.toString();
-      }
-      if(room !== null){
-        args.roomid = room._id.toString();
-      }
-      associate(args);
-    }
-    check();
-    
-  }, [user, room])
+  }, [roomid, userid]);
 
   // handle signals from the connection
   function handleConnectionEvent (event) {

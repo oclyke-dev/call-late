@@ -80,6 +80,10 @@ export function useUserCore(persistance: PersistantStorage): [(User | null), (id
     }
   }, [nonce]);
 
+  function get () {
+
+  }
+
   function sign_in(id: string, phone: string) {
     // to sign in the database must confirm that the 
     // supplied phone number matches the desired user
@@ -107,7 +111,7 @@ export function useUserCore(persistance: PersistantStorage): [(User | null), (id
     await fetch_gql(`mutation ($id: ID!, $phone: String!){ addPhoneNumberToUser(id: $id, phone: $phone){ _id tag phone }}`, {id: user._id, phone});
   }
 
-  return [user, sign_in, sign_out, associate_phone];
+  return [user, get, sign_in, sign_out, associate_phone];
 }
 
 // create a useUser hook that uses localstorage to maintain user between tabs
