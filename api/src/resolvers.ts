@@ -15,6 +15,7 @@ import {
   verify_user,
   GamePhase,
   advance_room_phase,
+  end_playing_game,
   change_settings,
   reset_room,
 } from '../../backend/src';
@@ -66,6 +67,11 @@ export const resolvers: any = {
       if(room === null){ throw new Error('room not found'); }
       if(room.phase !== GamePhase.WAITING){ throw new Error('game already started'); }
       room = await advance_room_phase(db, new ObjectId(args.room_id));
+      room !== null && await notify_room(room._id.toString());
+      return room;
+    },
+    endGameInProgress: async (parent: any, args: any) => {
+      const room = await end_playing_game(db, new ObjectId(args.room_id));
       room !== null && await notify_room(room._id.toString());
       return room;
     },

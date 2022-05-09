@@ -29,6 +29,7 @@ export type Mutation = {
   changeTotalCards: Maybe<Room>;
   createRoom: Maybe<Scalars['ID']>;
   createUser: Maybe<Scalars['ID']>;
+  endGameInProgress: Maybe<Room>;
   finishTurn: Maybe<Room>;
   resetRoom: Maybe<Room>;
   setPlayerOrders: Maybe<Room>;
@@ -63,6 +64,11 @@ export type MutationChangeTotalCardsArgs = {
 
 export type MutationCreateRoomArgs = {
   tag: Scalars['String'];
+};
+
+
+export type MutationEndGameInProgressArgs = {
+  room_id: Scalars['ID'];
 };
 
 
@@ -323,6 +329,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   changeTotalCards: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationChangeTotalCardsArgs, 'room_id' | 'total_cards'>>;
   createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
   createUser: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  endGameInProgress: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationEndGameInProgressArgs, 'room_id'>>;
   finishTurn: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationFinishTurnArgs, 'room_id' | 'user_id'>>;
   resetRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationResetRoomArgs, 'room_id' | 'tag'>>;
   setPlayerOrders: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationSetPlayerOrdersArgs, 'ordered' | 'room_id' | 'user_id'>>;
