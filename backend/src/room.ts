@@ -185,6 +185,15 @@ export async function advance_room_phase(db: Database, roomid: ObjectId) {
   return value;
 }
 
+export async function end_playing_game(db: Database, roomid: ObjectId) {
+  const filter = {
+    _id: roomid,
+    phase: GamePhase.PLAYING,
+  }
+  const {value} = await db.rooms.findOneAndUpdate(filter, {$set: {phase: GamePhase.FINISHED}}, {returnDocument: 'after'});
+  return value;
+}
+
 export async function set_players_order(db: Database, roomid: ObjectId, orderedids: ObjectId[]) {
   // note: if the ordered ids do not include all players then unlisted players are randomly assigned an order after ordered players
   const filter = {

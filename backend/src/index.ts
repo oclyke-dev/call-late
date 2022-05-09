@@ -23,6 +23,7 @@ export {
   remove_player_from_room,
   set_players_order,
   advance_room_phase,
+  end_playing_game,
   change_settings,
   reset_room,
 } from './room';
