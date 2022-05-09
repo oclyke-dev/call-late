@@ -248,6 +248,11 @@ export default () => {
 
       </DragDropContext>
     
+      {room.turn.user === userid && <>
+        <button onClick={async () => { await pickUpDiscard(); await finishTurn(null); }}>
+          skip turn
+        </button>
+      </>}
       {room.turn.user !== userid && <>
       <div
         style={{
