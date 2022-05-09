@@ -194,7 +194,7 @@ export default () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                    {discard_card && <React.Fragment key={`discard.${0}`}>
+                    {(discard_card !== null) && <React.Fragment key={`discard.${0}`}>
                       <Draggable isDragDisabled={turnref.current.source === RESERVE} draggableId={`${discard_card}`} index={0}>
                         {(provided) => (
                             <div
