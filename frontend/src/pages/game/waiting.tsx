@@ -61,6 +61,15 @@ export default () => {
     }
   }, [room]);
 
+  // auto-add player to game
+  const userid = (user !== null) ? user._id.toString() : null;
+  if(userid && !room.ordered.includes(userid)) {
+    async function addPlayerToGame() {
+      await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: room._id, user_id: userid});
+    }
+    addPlayerToGame();
+  }
+
   return <>
     <Sluice>
 

@@ -46,9 +46,6 @@ export default () => {
     join(tag)
     .then(r => {
       associate({roomid: r._id.toString(), userid});
-      if(typeof userid !== 'undefined'){
-        fetch_gql(`mutation ($room_id: ID!, $user_id: ID!){ addPlayerToRoom(room_id: $room_id, user_id: $user_id){ players }}`, {room_id: r._id, user_id: userid});
-      }
     })
     return function cleanup () {
       disconnect();
