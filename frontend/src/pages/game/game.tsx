@@ -69,6 +69,14 @@ export default () => {
 
       </GameContext.Provider>
 
+      {/* <pre>
+        {JSON.stringify(user, null, 2)}
+      </pre> */}
+
+      {/* <pre>
+        {JSON.stringify(room, null, 2)}
+      </pre> */}
+
     </>
   }
 }
