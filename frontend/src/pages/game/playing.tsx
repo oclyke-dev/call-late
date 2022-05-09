@@ -53,7 +53,7 @@ export default () => {
   }
 
   async function finishTurn (swap_index: number | null) {
-    await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $swap_index: Int!){ finishTurn(room_id: $room_id, user_id: $user_id, swap_index: $swap_index){ _id tag phase players }}`, {room_id: room._id, user_id: user._id, swap_index});
+    await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $swap_index: Int){ finishTurn(room_id: $room_id, user_id: $user_id, swap_index: $swap_index){ _id tag phase players }}`, {room_id: room._id, user_id: user._id, swap_index});
   }
 
   const hand = room.hands[user._id.toString()];
@@ -95,6 +95,9 @@ export default () => {
     }
 
     if(destination.droppableId === 'discard'){
+      if(source.droppableId === 'reserve') {
+        await finishTurn(null);
+      }
     }
 
     if(destination.droppableId === 'holder'){
