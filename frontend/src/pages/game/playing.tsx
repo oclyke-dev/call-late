@@ -32,6 +32,7 @@ const RESERVE = 1;
 
 export default () => {
   const {room, user} = useContext(GameContext);
+  const [end_game, setEndGame] = useState<boolean>(false);
 
   const turnref = useRef(room.turn);
   turnref.current = room.turn;
@@ -54,6 +55,10 @@ export default () => {
 
   async function finishTurn (swap_index: number | null) {
     await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $swap_index: Int){ finishTurn(room_id: $room_id, user_id: $user_id, swap_index: $swap_index){ _id tag phase players }}`, {room_id: room._id, user_id: user._id, swap_index});
+  }
+
+  async function endGame () {
+    await fetch_gql(`mutation ($room_id: ID!){ endGameInProgress(room_id: $room_id){ _id tag phase players }}`, {room_id: room._id});
   }
 
   const hand = room.hands[user._id.toString()];
@@ -248,11 +253,36 @@ export default () => {
 
       </DragDropContext>
     
-      {room.turn.user === userid && <>
-        <button onClick={async () => { await pickUpDiscard(); await finishTurn(null); }}>
-          skip turn
-        </button>
-      </>}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+      {(room.turn.user === userid) ? <>
+        <div>
+          <button onClick={async () => { await pickUpDiscard(); await finishTurn(null); }}>
+            skip turn
+          </button>
+        </div>
+      </> : <><div></div></>}
+        <div>
+          <button onClick={async () => { setEndGame(true); }}>
+            end game
+          </button>
+          {end_game && <>
+            <div>are you sure?</div>
+            <button onClick={() => { setEndGame(false); }}>
+              no
+            </button>
+            <button onClick={async () => { await endGame(); }}>
+              yes
+            </button>
+          </>}
+        </div>
+
+      </div>
       {room.turn.user !== userid && <>
       <div
         style={{

@@ -18,7 +18,8 @@ export default () => {
 
   return <>
     game finished!
-    the winner was {room.winner}
+    {room.winner && `the winner was ${room.winner}`}
+    {!room.winner && 'there was no winner'}
 
     <button
       onClick={async () => {
