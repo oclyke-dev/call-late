@@ -55,7 +55,6 @@ export default () => {
     join(tag)
     .then(r => {
       associate({roomid: r._id.toString(), userid});
-      console.log(r)
       sync_players(r.ordered);
     })
     .catch(console.error);
@@ -68,7 +67,6 @@ export default () => {
   function handleConnectionEvent (event) {
     check() // check room for updates (signalled by this event on websocket)
     .then(r => {
-      console.log(r)
       sync_players(r.ordered);
     })
     .catch(console.error);
