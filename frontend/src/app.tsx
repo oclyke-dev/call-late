@@ -5,6 +5,7 @@ import {
 import {
   useLocation,
   Outlet,
+  Link,
 } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
@@ -30,10 +31,25 @@ export default () => {
           minHeight: '100vh',
         }}
       >
+        <Header/>
         <Content/>
         {location.pathname === '/' && <ForkMe/>}
       </Box>
     </Sluice>
+  </>
+}
+
+function Header () {
+  return <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+
+      }}
+    >
+      <Link to='/'>call-late</Link>
+    </Box>
   </>
 }
 
@@ -54,13 +70,27 @@ function ForkMe () {
   return <>
     <Box
       sx={{
-        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+
+        // textAlign: 'center',
         margin: 1,
       }}
     >
-      <a href='https://github.com/oclyke-dev/call-late'>
-        github • {API_VER}
-      </a>
+      <Box
+        sx={{
+          marginRight: 2,
+        }}
+      >
+        <span>for Lia</span>
+      </Box>
+
+      <Box>
+        <a href='https://github.com/oclyke-dev/call-late'>
+          github • {API_VER}
+        </a>
+      </Box>
     </Box>  
   </>
 }

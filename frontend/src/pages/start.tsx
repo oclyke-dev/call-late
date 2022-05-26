@@ -26,9 +26,6 @@ export default () => {
   const [tag, setTag] = useState<{value: string, exists: boolean}>({value: '', exists: false});
 
   return <>
-    <div>call-late</div>
-
-    <div>for Lia</div>
 
     <div>
       <input 
