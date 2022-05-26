@@ -51,8 +51,10 @@ async function set_user_color(room_id: string, user_id: string, color: string): 
   return result.data.setUserColor;
 }
 
-export type GameContextType = {room: Room, user: User, players: UserPublic[]};
-export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: []});
+type UserPublicMap = {[key: string]: UserPublic}
+
+export type GameContextType = {room: Room, user: User, players: UserPublicMap};
+export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: {}});
 
 export default () => {
   const [connected, {connect, disconnect, associate}] = useConnection(handleConnectionEvent);
