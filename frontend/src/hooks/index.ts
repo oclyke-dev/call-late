@@ -11,3 +11,7 @@ export {
   useUser,
   useTabUser,
 } from './useUser';
+
+export {
+  usePlayers,
+} from './usePlayers';
