@@ -1,5 +1,7 @@
 import {
   default as React,
+  useState,
+  useContext,
 } from 'react';
 
 import {
@@ -8,6 +10,7 @@ import {
   Link,
 } from 'react-router-dom';
 
+import QRCode from 'qrcode';
 import Box from '@mui/material/Box';
 
 import {
@@ -18,10 +21,46 @@ import {
   API_VER,
 } from './constants';
 
+type QRInfoType = {
+  data: string,
+  visible: boolean,
+}
+
+export type AppContextType = {
+  onTagChange?: (tag: string) => void,
+  qrinfo: QRInfoType,
+  showqr: () => void,
+  hideqr: () => void,
+};
+export const AppContext = React.createContext<AppContextType>({});
+
 export default () => {
   const location = useLocation();
-  
+  const [qrinfo, setQRInfo] = useState<QRInfoType>({data: '', visible: false});
+
+  function showqr () { setQRInfo(prev => ({...prev, visible: true})); }
+  function hideqr () { setQRInfo(prev => ({...prev, visible: false})); }
+
   return <>
+
+
+    {qrinfo.visible && <>
+      <Box
+        sx={{
+          backgroundColor: '#000000',
+          // opacity: 0.5,
+          height: '100%',
+          width: '100%',
+          position: 'absolute'
+        }}
+        onClick={(e) => {
+          hideqr();
+        }}
+      >
+        <img src={qrinfo.data}/>
+      </Box>
+    </>}
+
     <Sluice>
       <Box 
         sx={{
@@ -31,15 +70,27 @@ export default () => {
           minHeight: '100vh',
         }}
       >
-        <Header/>
-        <Content/>
-        {location.pathname === '/' && <ForkMe/>}
+        <AppContext.Provider value={{
+          onTagChange: async (tag) => {
+            const data = await QRCode.toDataURL(`https://games.oclyke.dev/call-late/${tag}`, { errorCorrectionLevel: 'H' });
+            setQRInfo(prev => ({...prev, data}));
+          },
+          qrinfo,
+          showqr,
+          hideqr,
+        }}>
+          <Header/>
+          <Content/>
+          {location.pathname === '/' && <ForkMe/>}
+        </AppContext.Provider>
       </Box>
     </Sluice>
   </>
 }
 
 function Header () {
+  const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
+
   return <>
     <Box
       sx={{
@@ -49,6 +100,22 @@ function Header () {
       }}
     >
       <Link to='/'>call-late</Link>
+
+
+
+        <Box>
+          <button>
+            copy url
+          </button>
+          <button
+            onClick={(e) => {
+              showqr();
+            }}
+          >
+            show qr code
+          </button>
+        </Box>
+
     </Box>
   </>
 }

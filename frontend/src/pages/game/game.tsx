@@ -38,6 +38,10 @@ import {
   fetch_gql,
 } from '../../utils';
 
+import {
+  AppContext,
+} from '../../app';
+
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
@@ -57,6 +61,8 @@ export type GameContextType = {room: Room, user: User, players: UserPublicMap};
 export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: {}});
 
 export default () => {
+  const {onTagChange} = useContext(AppContext);
+
   const [connected, {connect, disconnect, associate}] = useConnection(handleConnectionEvent);
   const [room, join, check, leave] = useRoom();
   const [user, sign_in, sign_out] = useUser();
@@ -69,9 +75,10 @@ export default () => {
   useEffect(() => {
     connect().catch(console.error);
     join(tag)
-    .then(r => {
+    .then(async r => {
       associate({roomid: r._id.toString(), userid});
       sync_players(r.ordered);
+      onTagChange(r.tag);
     })
     .catch(console.error);
     return function cleanup () {
