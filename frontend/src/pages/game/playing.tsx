@@ -22,7 +22,6 @@ import {
 import {
   NumberCard,
   Holder,
-  Sluice,
 } from '../../components';
 
 // ugh this is not a cute look, but the enum def from the backend can't 
@@ -128,8 +127,6 @@ export default () => {
   const reserve_card =  (room.turn.source !== RESERVE) ? unknown_card : {number: room.turn.card, flipped: false}
 
   return <>
-
-    <Sluice>
       <DragDropContext
         onDragStart={onDragStart}
         onDragUpdate={onDragUpdate}
@@ -293,8 +290,5 @@ export default () => {
         IT IS NOT YOUR TURN
       </div>
     </>}
-
-    </Sluice>
-
   </>
 }

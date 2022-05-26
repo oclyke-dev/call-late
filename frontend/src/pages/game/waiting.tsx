@@ -18,7 +18,6 @@ import {
 import {
   PlayerCard,
   Holder,
-  Sluice,
 } from '../../components';
 
 import {
@@ -71,8 +70,6 @@ export default () => {
   }
 
   return <>
-    <Sluice>
-
       <DragDropContext
         onDragStart={undefined}
         onDragUpdate={undefined}
@@ -117,7 +114,5 @@ export default () => {
           start game
         </button>
       </div>
-
-    </Sluice>
   </>
 }

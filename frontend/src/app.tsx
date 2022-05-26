@@ -6,9 +6,15 @@ import {
   Outlet,
 } from 'react-router-dom';
 
+import {
+  Sluice,
+} from './components';
+
 export default () => {
   return <>
-    {/* outlet for pages */}
-    <Outlet />
+    <Sluice>
+      {/* outlet for pages */}
+      <Outlet />
+    </Sluice>
   </>
 }
