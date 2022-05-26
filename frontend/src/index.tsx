@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import {
   BrowserRouter,
@@ -18,7 +18,10 @@ import {
   default as App,
 } from './app';
 
-ReactDOM.render(
+
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
@@ -30,6 +33,5 @@ ReactDOM.render(
         </Route>
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
