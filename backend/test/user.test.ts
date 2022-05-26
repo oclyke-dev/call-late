@@ -73,7 +73,8 @@ test('many users public info can be found', async () => {
     return create_user(db);
   }));
   const result = await get_users_public(db, ids);
-  expect(result).toHaveLength(num_users);
+
+  expect(Object.keys(result)).toHaveLength(num_users);
 });
 
 test('users can add phone numbers', async () => {

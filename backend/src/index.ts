@@ -5,6 +5,7 @@ export {
   Database,
   Room,
   User,
+  UserPublic,
   GamePhase,
   Hand,
   Turn,

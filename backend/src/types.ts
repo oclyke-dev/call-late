@@ -20,6 +20,13 @@ export type User = OptionalId<{
   total_wins: number
 }>
 
+export type UserPublic = OptionalId<{
+  tag: string
+  color: string
+  total_games: number
+  total_wins: number
+}>
+
 export enum CardSource {
   DISCARD,
   RESERVE,

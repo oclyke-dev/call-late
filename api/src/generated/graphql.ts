@@ -14,6 +14,7 @@ export type Scalars = {
   Float: number;
   IntArrayDict: any;
   PlayerEntryDict: any;
+  PlayerPublicDict: any;
 };
 
 export type AdditionalEntityFields = {
@@ -108,6 +109,7 @@ export type Query = {
   getRoomById: Maybe<Room>;
   getRoomByTag: Maybe<Room>;
   getUserById: Maybe<User>;
+  getUsersPublic: Maybe<Scalars['PlayerPublicDict']>;
   verifyUser: Maybe<User>;
 };
 
@@ -124,6 +126,11 @@ export type QueryGetRoomByTagArgs = {
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryGetUsersPublicArgs = {
+  ids: InputMaybe<Array<Scalars['ID']>>;
 };
 
 
@@ -246,6 +253,7 @@ export type ResolversTypes = {
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   PlayerEntryDict: ResolverTypeWrapper<Scalars['PlayerEntryDict']>;
+  PlayerPublicDict: ResolverTypeWrapper<Scalars['PlayerPublicDict']>;
   Query: ResolverTypeWrapper<{}>;
   Room: ResolverTypeWrapper<Room>;
   Settings: ResolverTypeWrapper<Settings>;
@@ -263,6 +271,7 @@ export type ResolversParentTypes = {
   ID: Scalars['ID'];
   Int: Scalars['Int'];
   PlayerEntryDict: Scalars['PlayerEntryDict'];
+  PlayerPublicDict: Scalars['PlayerPublicDict'];
   Query: {};
   Room: Room;
   Settings: Settings;
@@ -341,10 +350,15 @@ export interface PlayerEntryDictScalarConfig extends GraphQLScalarTypeConfig<Res
   name: 'PlayerEntryDict';
 }
 
+export interface PlayerPublicDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PlayerPublicDict'], any> {
+  name: 'PlayerPublicDict';
+}
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getRoomById: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByIdArgs, 'id'>>;
   getRoomByTag: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByTagArgs, 'tag'>>;
   getUserById: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserByIdArgs, 'id'>>;
+  getUsersPublic: Resolver<Maybe<ResolversTypes['PlayerPublicDict']>, ParentType, ContextType, Partial<QueryGetUsersPublicArgs>>;
   verifyUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryVerifyUserArgs, 'id' | 'phone'>>;
 };
 
@@ -390,6 +404,7 @@ export type Resolvers<ContextType = any> = {
   IntArrayDict: GraphQLScalarType;
   Mutation: MutationResolvers<ContextType>;
   PlayerEntryDict: GraphQLScalarType;
+  PlayerPublicDict: GraphQLScalarType;
   Query: QueryResolvers<ContextType>;
   Room: RoomResolvers<ContextType>;
   Settings: SettingsResolvers<ContextType>;

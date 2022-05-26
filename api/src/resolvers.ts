@@ -11,6 +11,7 @@ import {
   set_players_order,
   create_user,
   get_user,
+  get_users_public,
   associate_user_phone_number,
   verify_user,
   GamePhase,
@@ -46,6 +47,10 @@ export const resolvers: any = {
     },
     verifyUser: async (parent: any, args: any) => {
       return await verify_user(db, new ObjectId(args.id), args.phone);
+    },
+    getUsersPublic: async (parent: any, args: any) => {
+      const ids = (args as {ids: string[]}).ids.map(id => new ObjectId(id));
+      return await get_users_public(db, ids);
     },
   },
   Mutation: {

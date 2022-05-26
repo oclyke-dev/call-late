@@ -5,6 +5,7 @@ import {
 import {
   Database,
   User,
+  UserPublic,
 } from '.';
 
 // stand-in functions to help make new users
@@ -32,8 +33,9 @@ export async function get_user(db: Database, _id: ObjectId) {
   return await db.users.findOne({_id});
 }
 
-function get_public_info(user: User) {
+function get_public_info(user: User): UserPublic {
   return {
+    _id: user._id,
     tag: user.tag,
     color: user.color,
     total_games: user.total_games,
@@ -43,7 +45,11 @@ function get_public_info(user: User) {
 export async function get_users_public(db: Database, ids: ObjectId[]) {
   const cursor = await db.users.find({_id: {$in: ids}});
   const users = await cursor.toArray();
-  return users.map(u => get_public_info(u));
+  const result: {[key: string]: UserPublic} = {};
+  users.forEach(u => {
+    result[u._id.toString()] = get_public_info(u)
+  })
+  return result;
 }
 
 export async function increment_user_game_count(db: Database, userid: ObjectId) {
