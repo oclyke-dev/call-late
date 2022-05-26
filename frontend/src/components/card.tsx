@@ -17,10 +17,10 @@ export function Card (props) {
   </>
 }
 
-export function PlayerCard ({player}) {
+export function PlayerCard ({name}) {
   return <>
     <Card>
-      {player}
+      {name}
     </Card>
   </>
 }

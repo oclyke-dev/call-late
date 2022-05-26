@@ -27,7 +27,7 @@ import {
 } from './game';
 
 export default () => {
-  const {room, user} = useContext(GameContext);
+  const {room, user, players} = useContext(GameContext);
   
   const [settings, setSettings] = useState<{total_cards: string | number, cards_per_hand: string | number}>({total_cards: 0, cards_per_hand: 0})
 
@@ -86,6 +86,12 @@ export default () => {
             >
               <Holder>
                 {room.ordered.map((player, idx) => {
+                  let info = players[player];
+                  let name = player;
+                  if (typeof info !== 'undefined') {
+                    name = info.tag;
+                  }
+
                   return <React.Fragment key={`player.${player}`}>
                     <Draggable draggableId={player} index={idx}>
                       {(provided) => (
@@ -94,7 +100,7 @@ export default () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <PlayerCard player={player}/>
+                          <PlayerCard name={name}/>
                         </div>
                       )}
                     </Draggable>

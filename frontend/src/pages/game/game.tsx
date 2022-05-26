@@ -115,8 +115,9 @@ export default () => {
 function Players () {
   const {room, user, players} = useContext(GameContext);
 
-  const self = players.filter(i => (user !== null && typeof i !== 'undefined' && i._id === user._id))[0];
-  const others = players.filter(i => (user !== null && typeof i !== 'undefined' && i._id !== user._id));
+  const userid = user._id.toString();
+  const self = players[Object.keys(players).filter(i => (user !== null && typeof i !== 'undefined' && i === userid))[0]];
+  const others = Object.keys(players).filter(i => (user !== null && typeof i !== 'undefined' && i !== userid)).map(id => players[id]);
 
   const idsref = useRef<{u?: string, r?: string}>({});
   idsref.current = {u: user._id.toString(), r: room._id.toString()}
