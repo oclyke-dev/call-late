@@ -13,6 +13,9 @@ export default {
     // out: 'dist', // defaults to 'build'
     baseUrl: '.',
   },
+  env: {
+    API_VER: 'v0',
+  },
   routes: [
     {match: 'routes', src: '.*', dest: '/index.html'} // fallback route for SPA https://www.snowpack.dev/guides/routing
   ]

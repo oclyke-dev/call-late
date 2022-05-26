@@ -3,6 +3,7 @@ import {
 } from 'react';
 
 import {
+  useLocation,
   Outlet,
 } from 'react-router-dom';
 
@@ -12,7 +13,13 @@ import {
   Sluice,
 } from './components';
 
+import {
+  API_VER,
+} from './constants';
+
 export default () => {
+  const location = useLocation();
+  
   return <>
     <Sluice>
       <Box 
@@ -23,21 +30,37 @@ export default () => {
           minHeight: '100vh',
         }}
       >
-
-        <Box
-          sx={{
-            flexGrow: 1,
-          }}
-        >
-          
-            {/* outlet for pages */}
-            <Outlet />
-        </Box>
-
-        <Box>
-          github link
-        </Box>
+        <Content/>
+        {location.pathname === '/' && <ForkMe/>}
       </Box>
     </Sluice>
+  </>
+}
+
+function Content () {
+  return <>
+    <Box
+      sx={{
+        flexGrow: 1,
+      }}
+    >
+        {/* outlet for pages */}
+        <Outlet />
+    </Box>
+  </>
+}
+
+function ForkMe () {
+  return <>
+    <Box
+      sx={{
+        textAlign: 'center',
+        margin: 1,
+      }}
+    >
+      <a href='https://github.com/oclyke-dev/call-late'>
+        github • {API_VER}
+      </a>
+    </Box>  
   </>
 }
