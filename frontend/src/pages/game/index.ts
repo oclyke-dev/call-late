@@ -7,10 +7,6 @@ export {
 } from './waiting';
 
 export {
-  default as Ordering
-} from './ordering';
-
-export {
   default as Playing
 } from './playing';
 
