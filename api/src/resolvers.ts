@@ -12,6 +12,8 @@ import {
   create_user,
   get_user,
   get_users_public,
+  user_set_color,
+  user_set_tag,
   associate_user_phone_number,
   verify_user,
   GamePhase,
@@ -121,6 +123,18 @@ export const resolvers: any = {
       const room = await change_settings(db, roomid, settings);
       room !== null && await notify_room(roomid.toString());
       return room;
+    },
+    setUserTag: async (parent: any, args: any) => {
+      const user = await user_set_tag(db, new ObjectId(args.user_id), args.tag);
+      await notify_room(args.room_id.toString());
+      console.log('set tag, result: ', user);
+      return user;
+    },
+    setUserColor: async (parent: any, args: any) => {
+      const user = await user_set_color(db, new ObjectId(args.user_id), args.color);
+      await notify_room(args.room_id.toString());
+      console.log('set color, result: ', user);
+      return user;
     },
   }
 }

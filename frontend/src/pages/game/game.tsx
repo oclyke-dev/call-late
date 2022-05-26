@@ -4,12 +4,16 @@ import {
 import {
   useEffect,
   useContext,
+  useState,
+  useRef,
 } from 'react';
 
 import {
   Link,
   useParams,
 } from 'react-router-dom';
+
+import { SliderPicker } from 'react-color';
 
 import {
   Waiting,
@@ -36,6 +40,16 @@ import {
 
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+
+async function set_user_tag(room_id: string, user_id: string, tag: string): Promise<User | null> {
+  const result = await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $tag: String!){ setUserTag(room_id: $room_id, user_id: $user_id, tag: $tag){_id}}`, {room_id, user_id, tag});
+  return result.data.setUserTag;
+}
+
+async function set_user_color(room_id: string, user_id: string, color: string): Promise<User | null> {
+  const result = await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $color: String!){ setUserColor(room_id: $room_id, user_id: $user_id, color: $color){_id}}`, {room_id, user_id, color});
+  return result.data.setUserColor;
+}
 
 export type GameContextType = {room: Room, user: User, players: UserPublic[]};
 export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: []});
@@ -100,36 +114,31 @@ export default () => {
 
 function Players () {
   const {room, user, players} = useContext(GameContext);
-  const others = players.filter(i => (typeof i !== 'undefined' && i._id !== user._id));
 
-  function Info (props: {info: User | UserPublic}) {
-    const info = props.info;
-    return <>
-      <Paper
-        sx={{
-          height: '50px',
-          margin: 1,
-          width: '300px',
-        }}
-      >
-        tag: {info.tag}
-        color: {info.color}
-        wins: {info.total_wins}
-        games: {info.total_games}
-      </Paper>
-    </>
-  }
+  const self = players.filter(i => (user !== null && typeof i !== 'undefined' && i._id === user._id))[0];
+  const others = players.filter(i => (user !== null && typeof i !== 'undefined' && i._id !== user._id));
+
+  const idsref = useRef<{u?: string, r?: string}>({});
+  idsref.current = {u: user._id.toString(), r: room._id.toString()}
 
   return <>
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'row',
-
       }}
     >
       <Box>
-        {user !== null && <Info info={user}/>}
+        {typeof self !== 'undefined' && <>
+          <Info
+            editable
+            stats
+            info={self}
+            onChange={async (tag, color) => {
+              await Promise.all([set_user_color(idsref.current.r, idsref.current.u, color), set_user_tag(idsref.current.r, idsref.current.u, tag), ]);
+            }}
+          />
+        </>}
       </Box>
 
       <Box
@@ -151,6 +160,168 @@ function Players () {
         })}
       </Box>
 
+    </Box>
+  </>
+}
+
+type EditResponder = (tag: string, color: string) => void;
+
+function Info (props: {info: User | UserPublic, stats?: boolean, editable?: boolean, onChange?: (tag: string, color: string) => void}) {
+  const info = props.info;
+  const stats = (typeof props.stats !== 'undefined') ? props.stats : false;
+  const editable = (typeof props.editable !== 'undefined') ? props.editable : false;
+
+  const [editing, setEditing] = useState<boolean>(false);
+  const [edit_tag, setEditTag] = useState<string>('')
+  const [edit_color, setEditColor] = useState<string>(info.color);
+
+  const responder = useRef<EditResponder>(undefined);
+  responder.current = props.onChange;
+
+
+  function notify(tag: string, color: string) {
+    if (typeof responder.current !== 'undefined') {
+      responder.current(tag, color);
+    }
+  }
+
+  function startEditing () {
+    setEditTag(info.tag);
+    setEditColor(info.color);
+    setEditing(true);
+  }
+
+  function stopEditing () {
+    setEditing(false);
+    notify(edit_tag, edit_color);
+  }
+
+  return <>
+    <Paper
+      sx={{
+        margin: 1,
+        minWidth: (editable) ? '160px' : '120px',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'start',
+          minHeight: 40,
+        }}
+      >
+
+          {/* user's color swatch */}
+          <Box sx={{ minWidth: '30px', backgroundColor: (editing) ? edit_color : info.color}}/>
+
+          {/* user info in a column */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1,
+              marginLeft: 1,
+            }}
+          >
+
+            {/* user's name */}
+            <Box>
+              {editable && editing && <>
+                <input
+                  value={edit_tag}
+                  onChange={(e) => {
+                    setEditTag(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if(e.key === 'Enter'){
+                      stopEditing();
+                    }
+                  }}
+                />
+              </>}
+
+              {!editing && <>
+                <span>
+                {info.tag}
+                </span>
+              </>}
+            </Box>
+
+            {/* user's stats */}
+            {stats && <>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Box>
+                  <span style={{color: 'green'}}>{info.total_wins}</span>
+                  /
+                  <span style={{}}>{info.total_games}</span>
+                  
+                  
+                </Box>
+              </Box>
+            </>}
+            
+
+          </Box>
+
+          {/* toggle for editing */}
+          {editable && <>
+            <Vcenter>
+              <Box
+                onClick={(e) => {
+                  if(editing){
+                    stopEditing();
+                  }else{
+                    startEditing();
+                  }
+                }}
+              >
+                {editing ? 'finish' : 'edit'}
+              </Box>
+            </Vcenter>
+          </>}
+
+        </Box>
+
+        {editing && <>
+          <Box
+            sx={{
+              margin: 1,
+            }}
+          >
+            <SliderPicker
+              color={edit_color}
+              onChange={(color) => {
+                setEditColor(color.hex);
+              }}
+              onComplete={(color) => {
+                setEditColor(color.hex);
+              }}
+            />
+          </Box>
+        </>}
+
+    </Paper>
+  </>
+}
+
+function Vcenter (props: any) {
+  return <>
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        fledDirection: 'column',
+        justifyContent: 'space-around',
+      }}
+    >
+      {props.children}
     </Box>
   </>
 }

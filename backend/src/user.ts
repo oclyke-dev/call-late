@@ -71,3 +71,13 @@ export async function associate_user_phone_number(db: Database, userid: ObjectId
 export async function verify_user(db: Database, _id: ObjectId, phone: string) {
   return await db.users.findOne({_id, phone});
 }
+
+export async function user_set_color(db: Database, _id: ObjectId, color: string) {
+  const {value} = await db.users.findOneAndUpdate({_id}, {$set: {color}}, {returnDocument: 'after'});
+  return value;
+}
+
+export async function user_set_tag(db: Database, _id: ObjectId, tag: string) {
+  const {value} = await db.users.findOneAndUpdate({_id}, {$set: {tag}}, {returnDocument: 'after'});
+  return value;
+}

@@ -23,6 +23,8 @@ type Mutation {
   addPhoneNumberToUser(id: ID!, phone: String!): User
   changeCardsPerHand(room_id: ID!, cards_per_hand: Int!): Room
   changeTotalCards(room_id: ID!, total_cards: Int!): Room
+  setUserTag(room_id: ID!, user_id: ID!, tag: String!): User
+  setUserColor(room_id: ID!, user_id: ID!, color: String!): User
 }
 
 type Turn {

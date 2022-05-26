@@ -37,6 +37,8 @@ export {
   increment_user_win_count,
   associate_user_phone_number,
   verify_user,
+  user_set_color,
+  user_set_tag,
 } from './user';
 
 export {
