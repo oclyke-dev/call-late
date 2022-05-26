@@ -61,7 +61,6 @@ export default () => {
   function handleConnectionEvent (event) {
     check() // check room for updates (signalled by this event on websocket)
     .then(r => {
-      console.log(r)
       sync_players(r.ordered);
     })
     .catch(console.error);

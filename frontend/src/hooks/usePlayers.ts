@@ -40,10 +40,6 @@ export function usePlayers (): [UserPublicMap, (ids: string[]) => void] {
 
   async function sync (ids: string[]) {
     const result = await get_users_public(ids);
-
-    console.log('requesting data for: ', ids)
-    console.log('got public player info: ', result)
-
     setPlayers(prev => ({...prev, ...result}));
   }
 
