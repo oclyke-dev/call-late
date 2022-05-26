@@ -35,12 +35,12 @@ async function get_users_public(ids: string[]): Promise<UserPublicMap | null> {
   return result.data.getUsersPublic;
 }
 
-export function usePlayers (): [UserPublicMap, (ids: string[]) => void] {
-  const [players, setPlayers] = useState<UserPublicMap>({});
+export function usePlayers (): [UserPublic[], (ids: string[]) => void] {
+  const [players, setPlayers] = useState<UserPublic[]>([]);
 
   async function sync (ids: string[]) {
     const result = await get_users_public(ids);
-    setPlayers(prev => ({...prev, ...result}));
+    setPlayers(Object.keys(result).map(id => result[id]));
   }
 
   return [players, sync]

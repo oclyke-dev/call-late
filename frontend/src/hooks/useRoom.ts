@@ -52,10 +52,25 @@ async function create_room(tag: string) {
 export function useRoom(): [Room | null, (tag: string) => Promise<Room>, () => Promise<Room>, () => void] {
   const [room, setRoom] = useState<Room | null>(null);
   const id = useRef<string | null>(null);
+  const lockref = useRef<boolean>(false);
+
+  function lock () {
+    lockref.current = true;
+  }
+  function unlock () {
+    lockref.current = false;
+  }
+  function locked () {
+    return lockref.current;
+  }
 
   // try to join a room by a given tag
   const join = (tag: string): Promise<Room> => {
+    if(locked()){
+      return Promise.reject('currently joining a room')
+    }
     return new Promise((resolve, reject) => {
+      lock();
       get_room_by_tag(tag)
       .then((existing) => {
         if(existing === null){
@@ -72,7 +87,10 @@ export function useRoom(): [Room | null, (tag: string) => Promise<Room>, () => P
         setRoom(room);
         resolve(room);
       })
-      .catch(reject);
+      .catch(reject)
+      .finally(() => {
+        unlock();
+      })
     });
   }
 

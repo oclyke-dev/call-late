@@ -49,14 +49,20 @@ type PersistantStorage = {
 export function useUserCore(persistance: PersistantStorage): [(User | null), (id: string, phone: string) => void, () => void, (phone: string) => void] {
   const [nonce, setNonce] = useState(new Object());
   const [user, setUser] = useState<User | null>(null);
+  const lock = useRef(false);
 
   // get the initial user either from local storage id 
   // or by creating a new user within the database
   useEffect(() => {
+    if(lock.current){
+      return;
+    }
     const localid = persistance.load();
     if(!localid){
+      lock.current = true; // lock user creation b/c react may load and unload this component while the user is created
       create_user()
       .then(id => {
+
         persistance.store(id);
         return get_user(id);
       })
@@ -64,7 +70,10 @@ export function useUserCore(persistance: PersistantStorage): [(User | null), (id
         console.log('got new user', user);
         setUser(user);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => {
+        lock.current = false; // unlock
+      })
     } else {
       get_user(localid)
       .then(user => {

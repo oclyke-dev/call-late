@@ -3,6 +3,7 @@ import {
 } from 'react';
 import {
   useEffect,
+  useContext,
 } from 'react';
 
 import {
@@ -33,8 +34,11 @@ import {
   fetch_gql,
 } from '../../utils';
 
-export type GameContextType = {room: Room, user: User, players: {[key: string]: UserPublic}};
-export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: {}});
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+
+export type GameContextType = {room: Room, user: User, players: UserPublic[]};
+export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: []});
 
 export default () => {
   const [connected, {connect, disconnect, associate}] = useConnection(handleConnectionEvent);
@@ -47,11 +51,14 @@ export default () => {
   const roomid = (room === null) ? undefined : room._id.toString();
   const userid = (user === null) ? undefined : user._id.toString();
   useEffect(() => {
-    connect();
+    connect().catch(console.error);
     join(tag)
     .then(r => {
       associate({roomid: r._id.toString(), userid});
+      console.log(r)
+      sync_players(r.ordered);
     })
+    .catch(console.error);
     return function cleanup () {
       disconnect();
     }
@@ -61,6 +68,7 @@ export default () => {
   function handleConnectionEvent (event) {
     check() // check room for updates (signalled by this event on websocket)
     .then(r => {
+      console.log(r)
       sync_players(r.ordered);
     })
     .catch(console.error);
@@ -71,6 +79,8 @@ export default () => {
   } else {
     return <>
       <GameContext.Provider value={{room, user, players}}>
+
+        <Players/>
 
         {room.phase === 0 && <Waiting />}
         {room.phase === 1 && <Playing />}
@@ -88,4 +98,61 @@ export default () => {
 
     </>
   }
+}
+
+function Players () {
+  const {room, user, players} = useContext(GameContext);
+  const others = players.filter(i => (typeof i !== 'undefined' && i._id !== user._id));
+
+  function Info (props: {info: User | UserPublic}) {
+    const info = props.info;
+    return <>
+      <Paper
+        sx={{
+          height: '50px',
+          margin: 1,
+          width: '300px',
+        }}
+      >
+        tag: {info.tag}
+        color: {info.color}
+        wins: {info.total_wins}
+        games: {info.total_games}
+      </Paper>
+    </>
+  }
+
+  return <>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+
+      }}
+    >
+      <Box>
+        {user !== null && <Info info={user}/>}
+      </Box>
+
+      <Box
+        sx={{
+          // overflow: 'auto',
+          overflow: 'scroll',
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'row',
+          minHeight: 'min-content',
+        }}
+      >
+        {others.map(info => {
+          // return <React.Fragment key={`player.${info._id}.info`}>
+          return <Box key={`player.${info._id}.info`}>
+            <Info info={info}/>
+          </Box>
+          // </React.Fragment>
+        })}
+      </Box>
+
+    </Box>
+  </>
 }
