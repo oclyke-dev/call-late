@@ -52,7 +52,6 @@ export default () => {
           type='text'
           value={tag.value}
           onChange={async (e) => {
-            console.log(e)
             const value = e.target.value;
             const result = await fetch_gql(`query { getRoomByTag(tag: "${value}"){_id}}`);
             setTag({value, exists: (result.data.getRoomByTag !== null)});
