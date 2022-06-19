@@ -12,6 +12,7 @@ import {
 
 import QRCode from 'qrcode';
 import Box from '@mui/material/Box';
+import {default as MUILink} from '@mui/material/Link';
 
 import Typography from '@mui/material/Typography';
 
@@ -168,9 +169,9 @@ function ForkMe () {
       </Box>
 
       <Box>
-        <a href='https://github.com/oclyke-dev/call-late'>
+        <MUILink href='https://github.com/oclyke-dev/call-late'>
           github • {API_VER}
-        </a>
+        </MUILink>
       </Box>
     </Box>  
   </>
