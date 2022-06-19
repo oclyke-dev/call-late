@@ -64,6 +64,7 @@ export const theme = createTheme({
     fontFamily: app_fonts.join(','),
 
     h1: {
+      fontSize: '4rem',
       fontFamily: [
         'Mali',
         // 'Shadows Into Light Two',
