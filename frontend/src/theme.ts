@@ -73,7 +73,7 @@ export const theme = createTheme({
 
 
 // colors
-const colors = {
+export const colors = {
   primary: {
     '50': '#d3def0',
     '100': '#95add2',
