@@ -12,6 +12,12 @@ import {
 } from 'react-beautiful-dnd';
 
 import {
+  styled,
+} from '@mui/material/styles';
+
+import Box from '@mui/material/Box';
+
+import {
   fetch_gql,
 } from '../../utils';
 
@@ -140,7 +146,11 @@ export default () => {
               ref={provided.innerRef}
               {...provided.droppableProps}
             >
-              <Holder>
+              <Holder
+                sx={{
+                  // maxWidth: '160px',
+                }}
+              >
                 {hand.map((value, idx) => {
                   return <React.Fragment key={`hand.${idx}`}>
                     <Draggable draggableId={`${value}`} index={idx}>
@@ -150,7 +160,7 @@ export default () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <NumberCard number={value}/>
+                          <NumberCard aspect={5} position={value/room.settings.total_cards} value={value}/>
                         </div>
                       )}
                     </Draggable>
@@ -173,12 +183,10 @@ export default () => {
 
           
           {/* discard stack */}
-          <div
+          <Box
             style={{
               padding: '5px',
-              backgroundColor: 'lightcoral',
-              flexGrow: 1,
-              minHeight: '100px',
+              width: '50%',
             }}
           >
             <Droppable droppableId={'discard'}>
@@ -199,7 +207,7 @@ export default () => {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                             >
-                              <NumberCard number={discard_card}/>
+                              <NumberCard position={discard_card/room.settings.total_cards} value={discard_card}/>
                             </div>
                           )}
                       </Draggable>
@@ -208,14 +216,19 @@ export default () => {
                 </div>
               )}
             </Droppable>
-          </div>
+            <Box>
+              discard
+            </Box>
+          </Box>
 
           {/* reserve cards */}
-          <div
+          <Box
             style={{
               padding: '5px',
-              backgroundColor: 'paleturquoise',
-              flexGrow: 1,
+              // backgroundColor: 'paleturquoise',
+              // flexGrow: 1,
+
+              width: '50%',
             }}
           >
             <Droppable droppableId={'reserve'}>
@@ -236,7 +249,7 @@ export default () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            <NumberCard number={reserve_card.number} flipped={reserve_card.flipped}/>
+                            <NumberCard value={reserve_card.number} position={reserve_card.number/room.settings.total_cards} flipped={reserve_card.flipped}/>
                           </div>
                         )}
                     </Draggable>
@@ -245,7 +258,10 @@ export default () => {
                 </div>
               )}
             </Droppable>
-          </div>
+            <Box>
+              reserve
+            </Box>
+          </Box>
         </div>
 
       </DragDropContext>

@@ -11,12 +11,16 @@ import {
 } from 'react-router-dom';
 
 import QRCode from 'qrcode';
-import Box from '@mui/material/Box';
 import {
-  styled,
+  useTheme,
 } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+
+import {
+  Title,
+} from './styles';
 
 import {
   Sluice,
@@ -98,17 +102,12 @@ export default () => {
   </>
 }
 
-const Title = styled(Typography)(({theme}) => ({
-  color: theme.palette.secondary.main,
-  fontStyle: 'italic',
-  fontWeight: 500,
-}));
-
-
-
 function Header () {
+  const theme = useTheme();
   const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
   const location = useLocation();
+
+  const is_big = useMediaQuery(theme.breakpoints.up('sm'));
 
   return <>
     <Box
@@ -119,7 +118,7 @@ function Header () {
       }}
     >
       <Link to='/' style={{textDecoration: 'none'}}>
-        <Title variant='h1'>
+        <Title variant={is_big ? 'h2' : 'h3'}>
           call-late
         </Title>
       </Link>

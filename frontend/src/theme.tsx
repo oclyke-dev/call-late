@@ -38,6 +38,7 @@ declare module '@mui/material/styles' {
 
 // app fonts
 const app_fonts = [
+  'Mali',
   'Comic Neue',
   'Roboto',
   'Arial',
@@ -62,17 +63,6 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: app_fonts.join(','),
-
-    h1: {
-      fontSize: '4rem',
-      fontFamily: [
-        'Mali',
-        // 'Shadows Into Light Two',
-        // 'Architects Daughter',
-        // 'Schoolbell',
-        ...app_fonts,
-      ].join(','),
-    },
   },
 
   // here is how the coors for various statuses are encoded in the theme
