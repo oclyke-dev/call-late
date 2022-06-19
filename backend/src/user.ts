@@ -2,6 +2,51 @@ import {
   ObjectId,
 } from 'mongodb';
 
+// @ts-ignore
+import * as greg from 'greg';
+
+import {
+  colors,
+} from '../../frontend/src/theme';
+
+const color_opts = [
+  colors.primary[50],
+  colors.primary[100],
+  colors.primary[200],
+  colors.primary[300],
+  colors.primary[400],
+
+  colors.complimentary[100],
+  colors.complimentary[200],
+  colors.complimentary[300],
+  colors.complimentary[400],
+
+  colors.analogous1[100],
+  colors.analogous1[300],
+  colors.analogous1[600],
+  colors.analogous1[800],
+
+  colors.analogous2[100],
+  colors.analogous2[300],
+  colors.analogous2[600],
+  colors.analogous2[800],
+
+  colors.triadic1[100],
+  colors.triadic1[100],
+  colors.triadic1[100],
+  colors.triadic1[100],
+
+  colors.triadic1[100],
+  colors.triadic1[300],
+  colors.triadic1[600],
+  colors.triadic1[800],
+
+  colors.triadic2[100],
+  colors.triadic2[300],
+  colors.triadic2[600],
+  colors.triadic2[800],
+]
+
 import {
   Database,
   User,
@@ -10,11 +55,15 @@ import {
 
 // stand-in functions to help make new users
 function get_random_color() {
-  return '#3dffd2';
+  const num_opts = color_opts.length;
+  const index = Math.floor(Math.random() * (num_opts - 1));
+  return color_opts[index];
 }
 
 function get_random_tag() {
-  return 'mario';
+  const sentence = greg.sentence();
+  const tokens = sentence.split(' ');
+  return [tokens[1], tokens[2]].join('-');
 }
 
 export async function create_user(db: Database) {
