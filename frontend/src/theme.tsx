@@ -49,6 +49,16 @@ export const theme = createTheme({
     background: {
       default: '#d3def0',
     },
+    primary: {
+      dark: '#004a8b',
+      main: '#4e79ad',
+      light: '#d3def0',
+    },
+    secondary: {
+      dark: '#670008',
+      main: '#b34e78',
+      light: '#d494ae',
+    }
   },
   typography: {
     fontFamily: app_fonts.join(','),
