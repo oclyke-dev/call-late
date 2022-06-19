@@ -2,13 +2,10 @@ import {
 	default as React,
 } from 'react';
 import {
-  useEffect,
   useState,
 } from 'react';
 
 import {
-  Link,
-  Outlet,
   useNavigate,
 } from 'react-router-dom';
 
@@ -22,11 +19,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-
-import {
-  useRoom,
-  useUser,
-} from '../hooks';
 
 import {
   fetch_gql,

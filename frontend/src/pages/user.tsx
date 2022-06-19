@@ -2,17 +2,12 @@ import {
 	default as React,
 } from 'react';
 import {
-  useEffect,
   useState,
 } from 'react';
 
 import {
   useUser,
 } from '../hooks';
-
-import {
-  fetch_gql,
-} from '../utils';
 
 export default () => {
   const [user, sign_in, sign_out, associate_phone] = useUser();
