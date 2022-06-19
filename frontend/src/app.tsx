@@ -100,6 +100,15 @@ const Title = styled(Typography)(({theme}) => ({
   fontWeight: 500,
 }));
 
+const HighlightText = styled(Typography)(({theme}) => ({
+  color: theme.palette.secondary.main,
+}));
+
+const HighlightLink = styled(MUILink)(({theme}) => ({
+  color: theme.palette.secondary.main,
+}));
+
+
 function Header () {
   const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
   const location = useLocation();
@@ -167,13 +176,13 @@ function ForkMe () {
           marginRight: 2,
         }}
       >
-        <span>for Lia</span>
+        <HighlightText variant='body1'>for Lia</HighlightText>
       </Box>
 
       <Box>
-        <MUILink href='https://github.com/oclyke-dev/call-late'>
+        <HighlightLink href='https://github.com/oclyke-dev/call-late'>
           github • {API_VER}
-        </MUILink>
+        </HighlightLink>
       </Box>
     </Box>  
   </>
