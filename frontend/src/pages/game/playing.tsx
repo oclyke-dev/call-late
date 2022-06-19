@@ -160,7 +160,9 @@ export default () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <NumberCard aspect={5} position={value/room.settings.total_cards} value={value}/>
+                          <Box sx={{margin: '0.25rem'}}>
+                            <NumberCard aspect={5} position={value/room.settings.total_cards} value={value}/>
+                          </Box>
                         </div>
                       )}
                     </Draggable>
