@@ -13,6 +13,9 @@ import {
 import QRCode from 'qrcode';
 import Box from '@mui/material/Box';
 import {default as MUILink} from '@mui/material/Link';
+import {
+  styled,
+} from '@mui/material/styles';
 
 import Typography from '@mui/material/Typography';
 
@@ -91,6 +94,12 @@ export default () => {
   </>
 }
 
+const Title = styled(Typography)(({theme}) => ({
+  color: theme.palette.secondary.main,
+  fontStyle: 'italic',
+  fontWeight: 500,
+}));
+
 function Header () {
   const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
   const location = useLocation();
@@ -104,16 +113,9 @@ function Header () {
       }}
     >
       <Link to='/' style={{textDecoration: 'none'}}>
-        <Typography
-          variant='h1'
-          style={{
-            fontWeight: 500,
-            fontStyle: 'italic',
-            color: '#b34e78',
-          }}
-        >
+        <Title variant='h1'>
           call-late
-        </Typography>
+        </Title>
       </Link>
 
     {location.pathname !== '/' && <>
