@@ -50,9 +50,9 @@ export default () => {
 
   return <>
 
-    <div>
+    <Box>
 
-      <Box sx={{marginBottom: '1rem'}}>
+      <Box sx={{marginBottom: '1rem', marginTop: '0.5rem'}}>
         <SelectorInput
           fullWidth
           disableUnderline
@@ -86,6 +86,6 @@ export default () => {
 
       <LightDivider/>
 
-    </div>
+    </Box>
   </>
 }
