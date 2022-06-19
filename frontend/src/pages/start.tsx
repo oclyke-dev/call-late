@@ -9,6 +9,9 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
+// @ts-ignore
+import * as greg from 'greg';
+
 import {
   styled,
 } from '@mui/material/styles';
@@ -21,6 +24,7 @@ import Box from '@mui/material/Box';
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import {
   HighlightType,
@@ -33,9 +37,15 @@ import {
 } from '../utils';
 
 
+function suggest_tag () {
+  const tokens = greg.sentence().split(' ');
+  return [tokens[1], tokens[2]].join('-');
+}
+
+
 const SelectorInput = styled(Input)(({theme}) => ({
   borderRadius: '100rem',
-  padding: '0 1rem 0 2rem',
+  padding: '0 0.5rem 0 0.5rem',
   fontSize: theme.typography.h4.fontSize,
   background: theme.palette.secondary.light,
   color: theme.palette.secondary.dark,
@@ -68,6 +78,7 @@ export default () => {
           disableUnderline
           id='standard-adornment-password'
           type='text'
+          placeholder='game id'
           value={tag.value}
           onChange={async (e) => {
             const value = e.target.value;
@@ -79,6 +90,20 @@ export default () => {
               navigate(`/${tag.value}`);
             }
           }}
+          startAdornment={
+            <InputAdornment position='start'>
+              <SelectorIconButton
+                aria-label='toggle password visibility'
+                onClick={async () => {
+                  const value = suggest_tag();
+                  const result = await fetch_gql(`query { getRoomByTag(tag: "${value}"){_id}}`);
+                  setTag({value, exists: (result.data.getRoomByTag !== null)});
+                }}
+              >
+                <CachedIcon/>
+              </SelectorIconButton>
+            </InputAdornment>
+          }          
           endAdornment={
             <InputAdornment position='end'>
               <SelectorIconButton
