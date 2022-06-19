@@ -12,7 +12,6 @@ import {
 
 import QRCode from 'qrcode';
 import Box from '@mui/material/Box';
-import {default as MUILink} from '@mui/material/Link';
 import {
   styled,
 } from '@mui/material/styles';
@@ -22,6 +21,11 @@ import Typography from '@mui/material/Typography';
 import {
   Sluice,
 } from './components';
+
+import {
+  HighlightType,
+  HighlightLink,
+} from './styles';
 
 import {
   API_VER,
@@ -100,13 +104,6 @@ const Title = styled(Typography)(({theme}) => ({
   fontWeight: 500,
 }));
 
-const HighlightText = styled(Typography)(({theme}) => ({
-  color: theme.palette.secondary.main,
-}));
-
-const HighlightLink = styled(MUILink)(({theme}) => ({
-  color: theme.palette.secondary.main,
-}));
 
 
 function Header () {
@@ -176,7 +173,7 @@ function ForkMe () {
           marginRight: 2,
         }}
       >
-        <HighlightText variant='body1'>for Lia</HighlightText>
+        <HighlightType variant='body1'>for Lia</HighlightType>
       </Box>
 
       <Box>
