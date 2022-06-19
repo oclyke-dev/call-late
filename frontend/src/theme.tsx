@@ -38,7 +38,6 @@ declare module '@mui/material/styles' {
 
 // app fonts
 const app_fonts = [
-  'Mali',
   'Comic Neue',
   'Roboto',
   'Arial',
