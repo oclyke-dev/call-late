@@ -16,6 +16,8 @@ import {
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
+import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -23,6 +25,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {
   fetch_gql,
 } from '../utils';
+
 
 const SelectorInput = styled(Input)(({theme}) => ({
   borderRadius: '100rem',
@@ -37,6 +40,10 @@ const SelectorIconButton = styled(IconButton)(({theme}) => ({
   color: theme.palette.secondary.main,
 }));
 
+const LightDivider = styled(Divider)(({theme}) => ({
+  borderColor: `${theme.palette.primary.main}40`,
+}));
+
 export default () => {
   const navigate = useNavigate();
   const [tag, setTag] = useState<{value: string, exists: boolean}>({value: '', exists: false});
@@ -45,6 +52,7 @@ export default () => {
 
     <div>
 
+      <Box sx={{marginBottom: '1rem'}}>
         <SelectorInput
           fullWidth
           disableUnderline
@@ -74,6 +82,9 @@ export default () => {
             </InputAdornment>
           }
         />
+      </Box>
+
+      <LightDivider/>
 
     </div>
   </>
