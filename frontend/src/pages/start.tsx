@@ -57,6 +57,11 @@ export default () => {
             const result = await fetch_gql(`query { getRoomByTag(tag: "${value}"){_id}}`);
             setTag({value, exists: (result.data.getRoomByTag !== null)});
           }}
+          onKeyDown={async (e) => {
+            if (e.key === 'Enter') {
+              navigate(`/${tag.value}`);
+            }
+          }}
           endAdornment={
             <InputAdornment position='end'>
               <SelectorIconButton
