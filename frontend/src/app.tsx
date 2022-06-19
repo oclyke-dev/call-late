@@ -102,12 +102,13 @@ function Header () {
 
       }}
     >
-      <Link to='/'>
+      <Link to='/' style={{textDecoration: 'none'}}>
         <Typography
           variant='h1'
           style={{
             fontWeight: 500,
             fontStyle: 'italic',
+            color: '#b34e78',
           }}
         >
           call-late
