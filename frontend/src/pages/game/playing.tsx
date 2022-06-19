@@ -133,140 +133,143 @@ export default () => {
   const reserve_card =  (room.turn.source !== RESERVE) ? unknown_card : {number: room.turn.card, flipped: false}
 
   return <>
-      <DragDropContext
-        onDragStart={onDragStart}
-        onDragUpdate={onDragUpdate}
-        onDragEnd={onDragEnd}
+    <DragDropContext
+      onDragStart={onDragStart}
+      onDragUpdate={onDragUpdate}
+      onDragEnd={onDragEnd}
+    >
+
+      {/* expander (fills space to push player's hand to bottom of screen) */}
+      <Box sx={{flexGrow: 1}}/>
+
+      {/* player's hand */}
+      <Droppable droppableId={'holder'}>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            <Holder
+              sx={{
+                // maxWidth: '160px',
+              }}
+            >
+              {hand.map((value, idx) => {
+                return <React.Fragment key={`hand.${idx}`}>
+                  <Draggable draggableId={`${value}`} index={idx}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <Box sx={{margin: '0.25rem'}}>
+                          <NumberCard aspect={5} position={value/room.settings.total_cards} value={value}/>
+                        </Box>
+                      </div>
+                    )}
+                  </Draggable>
+                </React.Fragment>
+              })}
+              {provided.placeholder}
+            </Holder>
+          </div>
+        )}
+      </Droppable>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          justifyContent: 'space-evenly',
+        }}
       >
 
-        {/* player's hand */}
-        <Droppable droppableId={'holder'}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              <Holder
-                sx={{
-                  // maxWidth: '160px',
-                }}
-              >
-                {hand.map((value, idx) => {
-                  return <React.Fragment key={`hand.${idx}`}>
-                    <Draggable draggableId={`${value}`} index={idx}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <Box sx={{margin: '0.25rem'}}>
-                            <NumberCard aspect={5} position={value/room.settings.total_cards} value={value}/>
-                          </Box>
-                        </div>
-                      )}
-                    </Draggable>
-                  </React.Fragment>
-                })}
-                {provided.placeholder}
-              </Holder>
-            </div>
-          )}
-        </Droppable>
-
-        <div
+        
+        {/* discard stack */}
+        <Box
           style={{
-            display: 'flex',
-            flexDirection: 'row',
-            width: '100%',
-            justifyContent: 'space-evenly',
+            padding: '5px',
+            width: '50%',
           }}
         >
-
-          
-          {/* discard stack */}
-          <Box
-            style={{
-              padding: '5px',
-              width: '50%',
-            }}
-          >
-            <Droppable droppableId={'discard'}>
-              {(provided) => (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                    {(discard_card !== null) && <React.Fragment key={`discard.${0}`}>
-                      <Draggable isDragDisabled={turnref.current.source === RESERVE} draggableId={`${discard_card}`} index={0}>
-                        {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              <NumberCard position={discard_card/room.settings.total_cards} value={discard_card}/>
-                            </div>
-                          )}
-                      </Draggable>
-                    </React.Fragment>}
-                    {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-            <Box>
-              discard
-            </Box>
-          </Box>
-
-          {/* reserve cards */}
-          <Box
-            style={{
-              padding: '5px',
-              // backgroundColor: 'paleturquoise',
-              // flexGrow: 1,
-
-              width: '50%',
-            }}
-          >
-            <Droppable droppableId={'reserve'}>
-              {(provided) => (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  {<React.Fragment key={`reserve.${0}`}>
-                    <Draggable isDragDisabled={turnref.current.source === DISCARD} draggableId={'reserve-card'} index={0}>
+          <Droppable droppableId={'discard'}>
+            {(provided) => (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                  {(discard_card !== null) && <React.Fragment key={`discard.${0}`}>
+                    <Draggable isDragDisabled={turnref.current.source === RESERVE} draggableId={`${discard_card}`} index={0}>
                       {(provided) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            <NumberCard value={reserve_card.number} position={reserve_card.number/room.settings.total_cards} flipped={reserve_card.flipped}/>
+                            <NumberCard position={discard_card/room.settings.total_cards} value={discard_card}/>
                           </div>
                         )}
                     </Draggable>
                   </React.Fragment>}
                   {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-            <Box>
-              reserve
-            </Box>
+              </div>
+            )}
+          </Droppable>
+          <Box>
+            discard
           </Box>
-        </div>
+        </Box>
 
-      </DragDropContext>
+        {/* reserve cards */}
+        <Box
+          style={{
+            padding: '5px',
+            // backgroundColor: 'paleturquoise',
+            // flexGrow: 1,
+
+            width: '50%',
+          }}
+        >
+          <Droppable droppableId={'reserve'}>
+            {(provided) => (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {<React.Fragment key={`reserve.${0}`}>
+                  <Draggable isDragDisabled={turnref.current.source === DISCARD} draggableId={'reserve-card'} index={0}>
+                    {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <NumberCard value={reserve_card.number} position={reserve_card.number/room.settings.total_cards} flipped={reserve_card.flipped}/>
+                        </div>
+                      )}
+                  </Draggable>
+                </React.Fragment>}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+          <Box>
+            reserve
+          </Box>
+        </Box>
+      </div>
+
+    </DragDropContext>
     
       <div
         style={{

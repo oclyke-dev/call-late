@@ -5,6 +5,8 @@ import {
   useContext,
 } from 'react';
 
+import Box from '@mui/material/Box';
+
 import {
   GameContext,
 } from './game';
@@ -19,6 +21,7 @@ export default () => {
   console.log(room)
 
   return <>
+
     game finished!
     {room.winner && `the winner was ${room.winner}`}
     {!room.winner && 'there was no winner'}
@@ -30,5 +33,7 @@ export default () => {
     >
       play again
     </button>
+
+    <Box sx={{flexGrow: 1}}/>
   </>
 }

@@ -94,7 +94,7 @@ export default () => {
           hideqr,
         }}>
           <Header/>
-          <Content/>
+          <Outlet/>
           {location.pathname === '/' && <ForkMe/>}
         </AppContext.Provider>
       </Box>
@@ -138,19 +138,6 @@ function Header () {
       </Box>
     </>}
 
-    </Box>
-  </>
-}
-
-function Content () {
-  return <>
-    <Box
-      sx={{
-        flexGrow: 1,
-      }}
-    >
-        {/* outlet for pages */}
-        <Outlet />
     </Box>
   </>
 }

@@ -14,6 +14,7 @@ import {
 } from 'react-beautiful-dnd';
 
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Typeography from '@mui/material/Typography';
 
 import {
@@ -75,75 +76,81 @@ export default () => {
   }
 
   return <>
-      <DragDropContext
-        onDragStart={undefined}
-        onDragUpdate={undefined}
-        onDragEnd={onDragEnd}
-      >
+    <DragDropContext
+      onDragStart={undefined}
+      onDragUpdate={undefined}
+      onDragEnd={onDragEnd}
+    >
 
-        <Droppable droppableId={'holder'}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              <Holder>
-                {room.ordered.map((player, idx) => {
-                  let info = players[player];
-                  let name = player;
-                  let color = 'none';
-                  if (typeof info !== 'undefined') {
-                    name = info.tag;
-                    color = info.color;
-                  }
+      <Droppable droppableId={'holder'}>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            <Holder>
+              {room.ordered.map((player, idx) => {
+                let info = players[player];
+                let name = player;
+                let color = 'none';
+                if (typeof info !== 'undefined') {
+                  name = info.tag;
+                  color = info.color;
+                }
 
-                  return <React.Fragment key={`player.${player}`}>
-                    <Draggable draggableId={player} index={idx}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
+                return <React.Fragment key={`player.${player}`}>
+                  <Draggable draggableId={player} index={idx}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
 
-                          <Card sx={{margin: '0.25rem', aspectRatio: '10/1'}}>
-                            {/* horizontal */}
-                            <Box sx={{height: '100%', display: 'flex', flexDirection: 'row'}}>
-                              {/* color swatch */}
-                              <Box sx={{minWidth: '30px', height: '100%', backgroundColor: color, marginRight: '0.5rem'}}></Box>
+                        <Card sx={{margin: '0.25rem', aspectRatio: '10/1'}}>
+                          {/* horizontal */}
+                          <Box sx={{height: '100%', display: 'flex', flexDirection: 'row'}}>
+                            {/* color swatch */}
+                            <Box sx={{minWidth: '30px', height: '100%', backgroundColor: color, marginRight: '0.5rem'}}></Box>
 
-                              {/* vertical align */}
-                              <Box sx={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}>
-                                <Box>
-                                  <Typeography variant='h5'>{name}</Typeography>
-                                </Box>
+                            {/* vertical align */}
+                            <Box sx={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}>
+                              <Box>
+                                <Typeography variant='h5'>{name}</Typeography>
                               </Box>
-
-                              {/* space sucker */}
-                              <Box sx={{display: 'flex', flexGrow: 1}}/>
-                              
                             </Box>
-                          </Card>
-                        </div>
-                      )}
-                    </Draggable>
-                  </React.Fragment>
-                })}
-                {provided.placeholder}
-              </Holder>
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
 
-      <div>
-        <button
-          onClick={async () => {
-            await fetch_gql(`mutation ($room_id: ID!){ startGame(room_id: $room_id){ _id tag phase players }}`, {room_id: room._id});
-          }}
-        >
-          start game
-        </button>
-      </div>
+                            {/* space sucker */}
+                            <Box sx={{display: 'flex', flexGrow: 1}}/>
+                            
+                          </Box>
+                        </Card>
+                      </div>
+                    )}
+                  </Draggable>
+                </React.Fragment>
+              })}
+              {provided.placeholder}
+            </Holder>
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+
+    <Box sx={{flexGrow: 1}}/>
+
+    <Box sx={{margin: '1rem', width: '100%', display: 'flex', 'justifyContent': 'space-around'}}>
+      <Button
+        sx={{width: '100%'}}
+        variant='contained'
+        color='secondary'
+        onClick={async () => {
+          await fetch_gql(`mutation ($room_id: ID!){ startGame(room_id: $room_id){ _id tag phase players }}`, {room_id: room._id});
+        }}
+      >
+        start game
+      </Button>
+    </Box>
+    
   </>
 }
