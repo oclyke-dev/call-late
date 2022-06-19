@@ -90,6 +90,7 @@ export default () => {
 
 function Header () {
   const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
+  const location = useLocation();
 
   return <>
     <Box
@@ -103,18 +104,20 @@ function Header () {
 
 
 
-        <Box>
-          <button>
-            copy url
-          </button>
-          <button
-            onClick={(e) => {
-              showqr();
-            }}
-          >
-            show qr code
-          </button>
-        </Box>
+    {location.pathname !== '/' && <>
+      <Box>
+        <button>
+          copy url
+        </button>
+        <button
+          onClick={(e) => {
+            showqr();
+          }}
+        >
+          show qr code
+        </button>
+      </Box>
+    </>}
 
     </Box>
   </>
