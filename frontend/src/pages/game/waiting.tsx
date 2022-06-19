@@ -13,12 +13,15 @@ import {
   Draggable,
 } from 'react-beautiful-dnd';
 
+import Box from '@mui/material/Box';
+import Typeography from '@mui/material/Typography';
+
 import {
   fetch_gql,
 } from '../../utils';
 
 import {
-  PlayerCard,
+  Card,
   Holder,
 } from '../../components';
 
@@ -88,8 +91,10 @@ export default () => {
                 {room.ordered.map((player, idx) => {
                   let info = players[player];
                   let name = player;
+                  let color = 'none';
                   if (typeof info !== 'undefined') {
                     name = info.tag;
+                    color = info.color;
                   }
 
                   return <React.Fragment key={`player.${player}`}>
@@ -100,7 +105,25 @@ export default () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <PlayerCard name={name}/>
+
+                          <Card sx={{margin: '0.25rem', aspectRatio: '10/1'}}>
+                            {/* horizontal */}
+                            <Box sx={{height: '100%', display: 'flex', flexDirection: 'row'}}>
+                              {/* color swatch */}
+                              <Box sx={{minWidth: '30px', height: '100%', backgroundColor: color, marginRight: '0.5rem'}}></Box>
+
+                              {/* vertical align */}
+                              <Box sx={{height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}>
+                                <Box>
+                                  <Typeography variant='h5'>{name}</Typeography>
+                                </Box>
+                              </Box>
+
+                              {/* space sucker */}
+                              <Box sx={{display: 'flex', flexGrow: 1}}/>
+                              
+                            </Box>
+                          </Card>
                         </div>
                       )}
                     </Draggable>

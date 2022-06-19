@@ -27,14 +27,6 @@ export const Number = styled(Typography)(({theme}) => ({
   fontWeight: 'bold',
 }));
 
-export function PlayerCard ({name}) {
-  return <>
-    <Card >
-      {name}
-    </Card>
-  </>
-}
-
 function CardBack() {
   const theme = useTheme();
   const is_big = useMediaQuery(theme.breakpoints.up('sm'));

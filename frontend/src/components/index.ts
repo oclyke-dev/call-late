@@ -1,6 +1,5 @@
 export {
   Card,
-  PlayerCard,
   NumberCard,
 } from './card';
 
