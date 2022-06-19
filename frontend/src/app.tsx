@@ -14,11 +14,6 @@ import QRCode from 'qrcode';
 import Box from '@mui/material/Box';
 
 import Typography from '@mui/material/Typography';
-import Checkbox from '@mui/material/Checkbox';
-
-import {
-  styled,
-} from '@mui/material/styles';
 
 import {
   Sluice,
