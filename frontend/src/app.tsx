@@ -13,6 +13,13 @@ import {
 import QRCode from 'qrcode';
 import Box from '@mui/material/Box';
 
+import Typography from '@mui/material/Typography';
+import Checkbox from '@mui/material/Checkbox';
+
+import {
+  styled,
+} from '@mui/material/styles';
+
 import {
   Sluice,
 } from './components';
@@ -100,9 +107,17 @@ function Header () {
 
       }}
     >
-      <Link to='/'>call-late</Link>
-
-
+      <Link to='/'>
+        <Typography
+          variant='h1'
+          style={{
+            fontWeight: 500,
+            fontStyle: 'italic',
+          }}
+        >
+          call-late
+        </Typography>
+      </Link>
 
     {location.pathname !== '/' && <>
       <Box>
