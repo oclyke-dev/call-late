@@ -3,7 +3,8 @@ import {
   useRef,
 } from 'react';
 
-const ws_endpoint = 'ws://localhost:8042';
+// const ws_endpoint = 'ws://localhost:8042';
+const ws_endpoint = 'wss://games.oclyke.dev/ws/call-late/session';
 
 type ConnectionOps = {
   connect: () => Promise<WebSocket>,
