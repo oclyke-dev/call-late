@@ -3,7 +3,7 @@ import {
   useRef,
 } from 'react';
 
-const ws_endpoint = 'ws://localhost:4001';
+const ws_endpoint = 'ws://localhost:8042';
 
 type ConnectionOps = {
   connect: () => Promise<WebSocket>,
