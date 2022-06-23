@@ -92,7 +92,6 @@ const run = async () => {
     },
   });
   const server_info = await server.listen();
-  await start_server();
   console.log(`listening on ${server_info.url}`)
 };
 
