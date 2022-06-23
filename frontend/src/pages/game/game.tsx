@@ -30,7 +30,7 @@ import {
 import {
   useConnection,
   useRoom,
-  useTabUser as useUser,
+  useUser,
   usePlayers,
 } from '../../hooks';
 
