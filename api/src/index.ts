@@ -20,7 +20,7 @@ import {
 } from 'mongodb';
 
 import {
-  start_server,
+  start_server as start_db_server,
   get_database,
   Database,
 } from '../../backend/src';
@@ -53,7 +53,7 @@ const run = async () => {
   console.log('Session websockets using SSL: ', session_using_ssl());
 
   // database connection
-  const mongoserver = await start_server();
+  const mongoserver = await start_db_server();
   const uri = mongoserver.getUri();
   const client = new MongoClient(uri);
   await client.connect();
