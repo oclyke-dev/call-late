@@ -40,8 +40,8 @@ render(
       >
         <Routes>
           <Route path='/' element={<App />}>
-            <Route path='@user' element={<User />} />
-            <Route path='@leaderboard' element={<Leaderboard />} />
+            <Route path='@/user' element={<User />} />
+            <Route path='@/leaderboard' element={<Leaderboard />} />
             <Route path=':tag' element={<Game />} />
             <Route index element={<Start />} />
           </Route>
