@@ -43,6 +43,10 @@ export let wss: WebSocketServer;
 const DEFAULT_SESSION_PORT = 8042;
 
 const run = async () => {
+  // print debug info
+  console.log('starting api')
+  console.log('NODE_ENV: ', process.env.NODE_ENV)
+
   // database connection
   const mongoserver = await start_server();
   const uri = mongoserver.getUri();
