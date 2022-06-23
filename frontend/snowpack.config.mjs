@@ -11,7 +11,7 @@ export default {
   },
   buildOptions: {
     // out: 'dist', // defaults to 'build'
-    baseUrl: '.',
+    baseUrl: 'call-late',
   },
   env: {
     API_VER: 'v0',
