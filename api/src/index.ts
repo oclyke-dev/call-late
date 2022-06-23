@@ -42,10 +42,15 @@ export let wss: WebSocketServer;
 
 const DEFAULT_SESSION_PORT = 8042;
 
+function session_using_ssl() {
+  return (typeof process.env.SESSION_BYPASS_SSL !== 'undefined') ? false : true;
+}
+
 const run = async () => {
   // print debug info
   console.log('starting api')
   console.log('NODE_ENV: ', process.env.NODE_ENV)
+  console.log('Session websockets using SSL: ', session_using_ssl());
 
   // database connection
   const mongoserver = await start_server();
@@ -56,7 +61,7 @@ const run = async () => {
 
   // websocket server
   const SESSION_PORT = (typeof process.env.SESSION_PORT !== 'undefined') ? parseInt(process.env.SESSION_PORT) : DEFAULT_SESSION_PORT;
-  if(process.env.NODE_ENV === 'development') {
+  if(!session_using_ssl()) {
     const wss = new WebSocketServer({ port: SESSION_PORT });
     start_wss(wss);
   } else {
@@ -75,6 +80,7 @@ const run = async () => {
     start_wss(wss);
     server.listen(SESSION_PORT);
   }
+  console.log(`session websocket server listening on wss://localhost:${SESSION_PORT}`);
 
   // graphql server
   const server = new ApolloServer({
