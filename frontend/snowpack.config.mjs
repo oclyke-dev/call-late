@@ -11,7 +11,7 @@ export default {
   },
   buildOptions: {
     out: 'dist',
-    baseUrl: 'call-late',
+    baseUrl: 'https://games.oclyke.dev/call-late',
   },
   env: {
     API_VER: 'v0',
