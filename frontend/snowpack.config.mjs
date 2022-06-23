@@ -6,7 +6,7 @@ export default {
     target: 'es2018',
   },
   mount: {
-    src: { url: '/dist' },
+    src: { url: '/!dist' },
     public: {url: '/', static: true},
   },
   buildOptions: {
