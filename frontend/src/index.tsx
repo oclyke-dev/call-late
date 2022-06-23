@@ -35,7 +35,9 @@ render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline/>
-      <BrowserRouter>
+      <BrowserRouter
+        basename='call-late'
+      >
         <Routes>
           <Route path='/' element={<App />}>
             <Route path='$user' element={<User />} />
