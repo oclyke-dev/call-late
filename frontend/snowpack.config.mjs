@@ -10,7 +10,7 @@ export default {
     public: {url: '/', static: true},
   },
   buildOptions: {
-    // out: 'dist', // defaults to 'build'
+    out: 'dist',
     baseUrl: 'call-late',
   },
   env: {
