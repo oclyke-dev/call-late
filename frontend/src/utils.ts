@@ -6,7 +6,7 @@ type Doc = {
 };
 
 // const gql_endpoint = 'http://localhost:4000';
-const gql_endpoint = 'https://games.oclyke.dev/gql/call-late/v0/';
+const gql_endpoint = 'https://games.oclyke.dev/gql/call-late/v0/api';
 
 export async function fetch_gql(query: string, variables?: Doc) {
   const r = await fetch(gql_endpoint, {
