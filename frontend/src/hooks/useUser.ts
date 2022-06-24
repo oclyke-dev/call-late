@@ -41,12 +41,18 @@ async function verify_user(id: string, phone: string): Promise<User | null> {
 type PersistantStorage = {
   store: (val: string) => void,
   load: () => string | null,
+  remove: (key: string) => void,
   clear: () => void,
 }
 
+type UseUserOps = {
+  sign_in: (id: string, phone: string) => void,
+  sign_out: () => void,
+  associate_phone: (phone: string) => void,
+  clear_storage: () => void,
+}
 
-
-export function useUserCore(persistance: PersistantStorage): [(User | null), (id: string, phone: string) => void, () => void, (phone: string) => void] {
+export function useUserCore(persistance: PersistantStorage): [(User | null), UseUserOps] {
   const [nonce, setNonce] = useState(new Object());
   const [user, setUser] = useState<User | null>(null);
   const lock = useRef(false);
@@ -106,7 +112,7 @@ export function useUserCore(persistance: PersistantStorage): [(User | null), (id
     // an id in localstorage authorizes use of that user
     // (yeah, not super secure lol but its a silly game)
     // therefore removing that id signs out the user
-    localStorage.removeItem(user_id_key);
+    persistance.remove(user_id_key);
     setUser(null);
   }
 
@@ -115,7 +121,18 @@ export function useUserCore(persistance: PersistantStorage): [(User | null), (id
     await fetch_gql(`mutation ($id: ID!, $phone: String!){ addPhoneNumberToUser(id: $id, phone: $phone){ _id tag phone }}`, {id: user._id, phone});
   }
 
-  return [user, sign_in, sign_out, associate_phone];
+  function clear_storage () {
+    persistance.clear();
+  }
+
+  const ops = {
+    sign_in,
+    sign_out,
+    associate_phone,
+    clear_storage,
+  }
+
+  return [user, ops];
 }
 
 // create a useUser hook that uses localstorage to maintain user between tabs
@@ -123,6 +140,7 @@ export function useUser() {
   const persistent_local_storage: PersistantStorage = {
     store: (val: string) => { localStorage.setItem(user_id_key, val); },
     load: () => { return localStorage.getItem(user_id_key); },
+    remove: () => { localStorage.removeItem(user_id_key); },
     clear: () => { localStorage.clear(); },
   }
 
@@ -135,6 +153,7 @@ export function useTabUser() {
   const persistant_session_storage: PersistantStorage = {
     store: (val: string) => { sessionStorage.setItem(user_id_key, val); },
     load: () => { return sessionStorage.getItem(user_id_key); },
+    remove: () => { sessionStorage.removeItem(user_id_key); },
     clear: () => { sessionStorage.clear(); },
   }
 

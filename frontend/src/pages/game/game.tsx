@@ -65,7 +65,7 @@ export default () => {
 
   const [connected, {connect, disconnect, associate}] = useConnection(handleConnectionEvent);
   const [room, join, check, leave] = useRoom();
-  const [user, sign_in, sign_out] = useUser();
+  const [user, {sign_in, sign_out, associate_phone, clear_storage}] = useUser();
   const [players, sync_players] = usePlayers();
   const { tag } = useParams();
 

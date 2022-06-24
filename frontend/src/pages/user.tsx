@@ -10,7 +10,7 @@ import {
 } from '../hooks';
 
 export default () => {
-  const [user, sign_in, sign_out, associate_phone] = useUser();
+  const [user, {sign_in, sign_out, associate_phone, clear_storage}] = useUser();
   const [signin, setSignin] = useState<{id: string, phone: string}>({id: '', phone: ''})
 
   return <>

@@ -19,6 +19,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 
 import {
+  useUser,
+} from './hooks';
+
+import {
   Title,
 } from './styles';
 
@@ -106,6 +110,7 @@ function Header () {
   const theme = useTheme();
   const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
   const location = useLocation();
+  const [user, {clear_storage}] = useUser();
 
   const is_big = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -134,6 +139,9 @@ function Header () {
           }}
         >
           show qr code
+        </button>
+        <button onClick={(e) => { clear_storage(); }}>
+          clear storage
         </button>
       </Box>
     </>}
