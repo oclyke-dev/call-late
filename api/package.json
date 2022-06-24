@@ -5,6 +5,7 @@
   "author": "oclyke",
   "license": "MIT",
   "scripts": {
+    "production": "node --experimental-fetch --loader ts-node/esm -r dotenv/config src/index.ts",
     "codegen": "graphql-codegen --config codegen.yml",
     "start": "nodemon --config nodemon.json"
   },
