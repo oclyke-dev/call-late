@@ -64,7 +64,37 @@ const RevertSpan = styled('span')(({theme}) => ({
   color: 'initial',
 }));
 
-let input_nonce;
+function makeSingle(generator) {
+  let globalNonce;
+  return async function(...args) {
+    const localNonce = globalNonce = new Object();
+
+    const iter = generator(...args);
+    let resumeValue;
+    for (;;) {
+      const n = iter.next(resumeValue);
+      if (n.done) {
+        return n.value;  // final return value of passed generator
+      }
+
+      // whatever the generator yielded, _now_ run await on it
+      resumeValue = await n.value;
+      if (localNonce !== globalNonce) {
+        console.warn('preemption was made');
+        return;  // a new call was made
+      }
+      // next loop, we give resumeValue back to the generator
+    }
+  };
+}
+
+function* checkTag(value, setter) {
+  const result = yield fetch_gql(`query { getRoomByTag(tag: "${value}"){_id}}`); // check with server to see if this tag exists  
+  setter(prev => ({...prev, exists: (result.data.getRoomByTag !== null)})); // finally update the tag existence
+}
+const checkTagSingle = makeSingle(checkTag);
+
+
 
 export default () => {
   const navigate = useNavigate();
@@ -83,21 +113,9 @@ export default () => {
           placeholder='game id'
           value={tag.value}
           onChange={async (e) => {
-            // create a nonce to detect preemption
-            const local_nonce = input_nonce = new Object();
-
-            // handle the user's typing
-            const value = e.target.value;
+            const value = e.target.value; // handle the user's typing
             setTag(prev => ({...prev, value})); // set tag immediately
-
-            // check with server to see if this tag exists
-            const result = await fetch_gql(`query { getRoomByTag(tag: "${value}"){_id}}`);
-            if (local_nonce !== input_nonce) {
-              return; // if another check has been initiated then just stop here
-            }
-
-            // finally update the tag existence
-            setTag(prev => ({...prev, exists: (result.data.getRoomByTag !== null)}));
+            checkTagSingle(value, setTag); // check tag for existence w/ preemption
           }}
           onKeyDown={async (e) => {
             if (e.key === 'Enter') {
