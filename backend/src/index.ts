@@ -45,4 +45,5 @@ export {
   start_server,
   get_database,
   initialize_database,
+  get_db_client,
 } from './utils';

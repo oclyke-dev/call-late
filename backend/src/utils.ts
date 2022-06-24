@@ -1,5 +1,6 @@
 import {
   MongoClient,
+  ServerApiVersion,
 } from 'mongodb';
 
 import {
@@ -12,8 +13,40 @@ import {
   Hand,
 } from '.';
 
+const DBNAME = 'call-late';
+
 function memorydb_allowed() {
   return (typeof process.env.ALLOW_MEMORY_DB !== 'undefined') ? true : false;
+}
+
+export async function get_db_client() {
+  let client;
+  if (process.env.NODE_ENV === 'development'){
+    console.log('using in-memory mongodb');
+    const mongoserver = await start_server();
+    const uri = mongoserver.getUri();
+    client = new MongoClient(uri);
+    
+  } else if (process.env.NODE_ENV === 'production') {
+
+    console.log('connecting to remote database');
+    if (typeof process.env.DB_PASSWORD === 'undefined') {
+      throw new Error('DB_PASSWORD not defined');
+    }
+    if (typeof process.env.DB_USERNAME === 'undefined') {
+      throw new Error('DB_USERNAME not defined');
+    }
+
+    const DB_PASSWORD = process.env.DB_PASSWORD;
+    const DB_USERNAME = process.env.DB_USERNAME;
+    const uri = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@oclyke-sandboc.k8ns8.gcp.mongodb.net/?retryWrites=true&w=majority`;
+    client = new MongoClient(uri, { /*useNewUrlParser: true, useUnifiedTopology: true,*/ serverApi: ServerApiVersion.v1 });
+
+  } else {
+    throw new Error('unknown environment');
+  }
+
+  return client;
 }
 
 export async function start_server() {
@@ -32,8 +65,8 @@ export async function start_server() {
 
 export function get_database(client: MongoClient) {
   const db: Database = {
-    rooms: client.db().collection('rooms'),
-    users: client.db().collection('users'),
+    rooms: client.db(DBNAME).collection('rooms'),
+    users: client.db(DBNAME).collection('users'),
   };
   return db;
 }
