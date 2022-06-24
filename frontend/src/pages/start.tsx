@@ -80,7 +80,6 @@ function makeSingle(generator) {
       // whatever the generator yielded, _now_ run await on it
       resumeValue = await n.value;
       if (localNonce !== globalNonce) {
-        console.warn('preemption was made');
         return;  // a new call was made
       }
       // next loop, we give resumeValue back to the generator
