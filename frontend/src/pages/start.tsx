@@ -174,7 +174,7 @@ export default () => {
           <li><HighlightSpan sx={{marginRight: '1rem'}}>wait your turn</HighlightSpan><RevertSpan>use this time to think of a funny comeback or heckle 😜</RevertSpan></li>
           <li><HighlightSpan sx={{marginRight: '1rem'}}>pick up a card</HighlightSpan><RevertSpan>there are two choices - the discard pile or the reserve. no give-backs from the reserve pile!</RevertSpan></li>
           <li><HighlightSpan sx={{marginRight: '1rem'}}>give it a home</HighlightSpan><RevertSpan>the card can either go in your hand or to the discard pile - choose wisely!</RevertSpan></li>
-          <li><HighlightSpan sx={{marginRight: '1rem'}}>give it a home</HighlightSpan><RevertSpan>no pressure...</RevertSpan></li>
+          <li><HighlightSpan sx={{marginRight: '1rem'}}>try to win</HighlightSpan><RevertSpan>no pressure...</RevertSpan></li>
         </HighlightUL>
 
         {/* winning */}
