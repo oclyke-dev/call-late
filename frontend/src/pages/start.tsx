@@ -93,6 +93,10 @@ function* checkTag(value, setter) {
 }
 const checkTagSingle = makeSingle(checkTag);
 
+function validate_tag(value: string): string {
+  const validated = value.toLowerCase().replace(' ', '-');;
+  return validated;
+}
 
 
 export default () => {
@@ -113,8 +117,9 @@ export default () => {
           value={tag.value}
           onChange={async (e) => {
             const value = e.target.value; // handle the user's typing
-            setTag(prev => ({...prev, value})); // set tag immediately
-            checkTagSingle(value, setTag); // check tag for existence w/ preemption
+            const validated = validate_tag(value);
+            setTag(prev => ({...prev, value: validated})); // set tag immediately
+            checkTagSingle(validated, setTag); // check tag for existence w/ preemption
           }}
           onKeyDown={async (e) => {
             if (e.key === 'Enter') {
