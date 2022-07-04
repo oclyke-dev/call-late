@@ -26,6 +26,8 @@ import IconButton from '@mui/material/IconButton';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import IosShareIcon from '@mui/icons-material/IosShare';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CheckIcon from '@mui/icons-material/Check';
 
 import {
   useUser,
@@ -54,6 +56,10 @@ type QRInfoType = {
   anchor: HTMLButtonElement | null,
   show: () => void,
   hide: () => void,
+}
+
+type SettingsInfoType = {
+  show: boolean,
 }
 
 export type AppContextType = {
@@ -133,6 +139,10 @@ function Header () {
   const location = useLocation();
   const { tag } = useParams();
 
+  const [settingsinfo, setSettingsInfo] = useState<SettingsInfoType>({show: false});
+  function showSettings () { setSettingsInfo(prev => ({...prev, show: true})); }
+  function hideSettings () { setSettingsInfo(prev => ({...prev, show: false})); }
+
   const is_big = useMediaQuery(theme.breakpoints.up('sm'));
 
   function copyurl () {
@@ -162,6 +172,8 @@ function Header () {
             <HighlightType variant='h5'>{tag}</HighlightType>
             <IconButton color='secondary' onClick={copyurl}><ContentCopyIcon/></IconButton>
             <IconButton color='secondary' onClick={qrinfo.show}><QrCode2Icon/></IconButton>
+
+            <IconButton color='secondary' onClick={(settingsinfo.show) ? hideSettings : showSettings}>{(settingsinfo.show) ? <CheckIcon/> : <SettingsIcon/> }</IconButton>
           </Stack>
         </Box>
       </Box>
