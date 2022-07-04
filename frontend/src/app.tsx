@@ -14,20 +14,28 @@ import {
 import QRCode from 'qrcode';
 import {
   useTheme,
+  styled,
 } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import Box from '@mui/material/Box';
+import Input from '@mui/material/Input';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 // import Popover from '@mui/material/Popover';
+import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
 
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CheckIcon from '@mui/icons-material/Check';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PersonIcon from '@mui/icons-material/Person';
+import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import {
   useUser,
@@ -59,6 +67,17 @@ type QRInfoType = {
 }
 
 type SettingsInfoType = {
+  show: boolean,
+}
+
+type SignInInfoType = {
+  phone: string,
+  id: string,
+  show: boolean,
+}
+
+type AssociateInfoType = {
+  phone: string,
   show: boolean,
 }
 
@@ -137,11 +156,22 @@ function Header () {
   const theme = useTheme();
   const {onTagChange, qrinfo} = useContext(AppContext);
   const location = useLocation();
+  const [user, {sign_in, sign_out, associate_phone, clear_storage}] = useUser();
   const { tag } = useParams();
 
   const [settingsinfo, setSettingsInfo] = useState<SettingsInfoType>({show: false});
   function showSettings () { setSettingsInfo(prev => ({...prev, show: true})); }
   function hideSettings () { setSettingsInfo(prev => ({...prev, show: false})); }
+
+  const initial_signininfo = {show: false, phone: '', id: ''};
+  const [signininfo, setSignInInfo] = useState<SignInInfoType>(initial_signininfo);
+  function showSignIn () { setSignInInfo(prev => ({...prev, show: true})); }
+  function hideSignIn () { setSignInInfo(prev => ({...prev, show: false})); }
+
+  const initial_associateinfo = {show: false, phone: ''};
+  const [associateinfo, setAssociateInfo] = useState<AssociateInfoType>(initial_associateinfo);
+  function showAssociate () { setAssociateInfo(prev => ({...prev, show: true})); }
+  function hideAssociate () { setAssociateInfo(prev => ({...prev, show: false})); }
 
   const is_big = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -152,36 +182,141 @@ function Header () {
   }
 
   return <>
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
+    <Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
 
-      }}
-    >
-      <Link to='/' style={{textDecoration: 'none'}}>
-        <Title variant={is_big ? 'h2' : 'h3'}>
-          call-late
-        </Title>
-      </Link>
+        }}
+      >
+        <Link to='/' style={{textDecoration: 'none'}}>
+          <Title variant={is_big ? 'h2' : 'h3'}>
+            call-late
+          </Title>
+        </Link>
 
-    {location.pathname !== '/' && <>
-      <Box sx={{display: 'flex', flexDirection: 'row', flexGrow: 1, justifyContent: 'space-around'}}>
-        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'end'}}>
-          <Stack direction='row' spacing={2}>
-            <HighlightType variant='h5'>{tag}</HighlightType>
-            <IconButton color='secondary' onClick={copyurl}><ContentCopyIcon/></IconButton>
-            <IconButton color='secondary' onClick={qrinfo.show}><QrCode2Icon/></IconButton>
+      {location.pathname !== '/' && <>
+        <Box sx={{display: 'flex', flexDirection: 'row', flexGrow: 1, justifyContent: 'space-around'}}>
+          <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'end'}}>
+            <Stack direction='row' spacing={2}>
+              <HighlightType variant='h5'>{tag}</HighlightType>
+              <IconButton color='secondary' onClick={copyurl}><ContentCopyIcon/></IconButton>
+              <IconButton color='secondary' onClick={qrinfo.show}><QrCode2Icon/></IconButton>
 
-            <IconButton color='secondary' onClick={(settingsinfo.show) ? hideSettings : showSettings}>{(settingsinfo.show) ? <CheckIcon/> : <SettingsIcon/> }</IconButton>
-          </Stack>
+              <IconButton color='secondary' onClick={(settingsinfo.show) ? hideSettings : showSettings}>{(settingsinfo.show) ? <CheckIcon/> : <SettingsIcon/> }</IconButton>
+            </Stack>
+          </Box>
         </Box>
+      </>}
+
       </Box>
+
+    {/* settings */}
+    {settingsinfo.show && <>
+      <Box>
+        <Tooltip title='clear user data'><IconButton onClick={clear_storage}><DeleteIcon/></IconButton></Tooltip>
+        <Tooltip title='sign out'><IconButton onClick={sign_out}><GroupRemoveIcon/></IconButton></Tooltip>
+        <Tooltip title='sign in'><IconButton onClick={(signininfo.show) ? hideSignIn : showSignIn}>{(signininfo.show) ? <CheckIcon/> : <PersonIcon/>}</IconButton></Tooltip>
+        <Tooltip title='save your account'><IconButton onClick={(associateinfo.show) ? hideAssociate : showAssociate}>{(associateinfo.show) ? <CheckIcon/> : <GroupAddIcon/>}</IconButton></Tooltip>
+      </Box>
+
+      {/* sign in */}
+      {signininfo.show && <>
+        <Box sx={{display: 'flex', flexDirection: 'row'}}>
+
+          {/* inputs */}
+          <Box sx={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
+            {/* username */}
+            <SignInInput
+              placeholder='user id'
+              value={signininfo.id}
+              onChange={async (e) => {
+                const value = e.target.value;
+                setSignInInfo(prev => ({...prev, id: value}));
+              }}
+            />
+
+            {/* phone number */}
+            <SignInInput
+              placeholder='phone number'
+              value={signininfo.phone}
+              onChange={async (e) => {
+                const value = e.target.value;
+                setSignInInfo(prev => ({...prev, phone: value}));
+              }}
+            />
+          </Box>
+
+          {/* button */}
+          <Box sx={{minWidth: '25%', height: '100%'}}>
+            <Button
+              sx={{margin: '1em'}}
+              color='secondary'
+              variant='contained'
+              fullWidth
+              onClick={() => {
+                sign_in(signininfo.id, signininfo.phone);
+                setSignInInfo(initial_signininfo)
+              }}
+            >
+              sign in
+            </Button>
+          </Box>
+        </Box>
+
+      </>}
+
+      {associateinfo.show && <>
+        <Box sx={{display: 'flex', flexDirection: 'row'}}>
+
+          {/* inputs */}
+          <Box sx={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
+            {/* phone number */}
+            <SignInInput
+              placeholder='phone number'
+              value={associateinfo.phone}
+              onChange={async (e) => {
+                const value = e.target.value;
+                setAssociateInfo(prev => ({...prev, phone: value}));
+              }}
+            />
+          </Box>
+
+          {/* button */}
+          <Box sx={{minWidth: '25%', height: '100%'}}>
+          <Button
+              sx={{margin: '1em'}}
+              color='secondary'
+              variant='contained'
+              fullWidth
+              onClick={() => {
+                associate_phone(associateinfo.phone);
+                setAssociateInfo(initial_associateinfo)
+              }}
+            >
+              save account
+            </Button>
+          </Box>
+
+        </Box>
+      
+      </>}
+
     </>}
 
     </Box>
   </>
 }
+
+const SignInInput = styled(Input)(({theme}) => ({
+  // borderRadius: '100rem',
+  // padding: '0 0.5rem 0 0.5rem',
+  // fontSize: theme.typography.h4.fontSize,
+  // background: theme.palette.secondary.light,
+  // color: theme.palette.secondary.dark,
+  // boxShadow: `0.25rem 0.25rem 0.25rem ${theme.palette.grey[400]}`
+}));
 
 function ForkMe () {
   return <>
