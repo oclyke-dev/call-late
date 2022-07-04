@@ -44,6 +44,11 @@ import {
 
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+
+import SettingsIcon from '@mui/icons-material/Settings';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 async function set_user_tag(room_id: string, user_id: string, tag: string): Promise<User | null> {
   const result = await fetch_gql(`mutation ($room_id: ID!, $user_id: ID!, $tag: String!){ setUserTag(room_id: $room_id, user_id: $user_id, tag: $tag){_id}}`, {room_id, user_id, tag});
@@ -283,17 +288,9 @@ function Info (props: {info: User | UserPublic, stats?: boolean, editable?: bool
           {/* toggle for editing */}
           {editable && <>
             <Vcenter>
-              <Box
-                onClick={(e) => {
-                  if(editing){
-                    stopEditing();
-                  }else{
-                    startEditing();
-                  }
-                }}
-              >
-                {editing ? 'finish' : 'edit'}
-              </Box>
+              <IconButton color='secondary' onClick={(editing) ? stopEditing : startEditing }>
+                {editing ? <CheckIcon/> : <SettingsIcon/>}
+              </IconButton>
             </Vcenter>
           </>}
 
