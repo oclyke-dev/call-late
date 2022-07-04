@@ -1,5 +1,6 @@
 export {
-  default
+  default,
+  Info,
 } from './game';
 
 export {

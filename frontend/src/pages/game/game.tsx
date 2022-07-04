@@ -64,6 +64,9 @@ type UserPublicMap = {[key: string]: UserPublic}
 
 export type GameContextType = {room: Room, user: User, players: UserPublicMap};
 export const GameContext = React.createContext<GameContextType>({room: undefined, user: undefined, players: {}});
+export {
+  Info,
+}
 
 export default () => {
   const {onTagChange} = useContext(AppContext);
