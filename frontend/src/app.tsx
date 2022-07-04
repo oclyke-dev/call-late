@@ -8,6 +8,7 @@ import {
   useLocation,
   Outlet,
   Link,
+  useParams,
 } from 'react-router-dom';
 
 import QRCode from 'qrcode';
@@ -17,6 +18,14 @@ import {
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton';
+// import Popover from '@mui/material/Popover';
+
+import QrCode2Icon from '@mui/icons-material/QrCode2';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import IosShareIcon from '@mui/icons-material/IosShare';
 
 import {
   useUser,
@@ -42,42 +51,28 @@ import {
 type QRInfoType = {
   data: string,
   visible: boolean,
+  anchor: HTMLButtonElement | null,
+  show: () => void,
+  hide: () => void,
 }
 
 export type AppContextType = {
   onTagChange?: (tag: string) => void,
   qrinfo: QRInfoType,
-  showqr: () => void,
-  hideqr: () => void,
+
 };
 export const AppContext = React.createContext<AppContextType>({});
 
+
 export default () => {
   const location = useLocation();
-  const [qrinfo, setQRInfo] = useState<QRInfoType>({data: '', visible: false});
 
   function showqr () { setQRInfo(prev => ({...prev, visible: true})); }
   function hideqr () { setQRInfo(prev => ({...prev, visible: false})); }
 
+  const [qrinfo, setQRInfo] = useState<QRInfoType>({data: '', visible: false, anchor: null, show: showqr, hide: hideqr});
+
   return <>
-
-
-    {qrinfo.visible && <>
-      <Box
-        sx={{
-          backgroundColor: '#000000',
-          // opacity: 0.5,
-          height: '100%',
-          width: '100%',
-          position: 'absolute'
-        }}
-        onClick={(e) => {
-          hideqr();
-        }}
-      >
-        <img src={qrinfo.data}/>
-      </Box>
-    </>}
 
     <Sluice>
       <Box 
@@ -94,8 +89,6 @@ export default () => {
             setQRInfo(prev => ({...prev, data}));
           },
           qrinfo,
-          showqr,
-          hideqr,
         }}>
           <Header/>
           <Outlet/>
@@ -103,16 +96,50 @@ export default () => {
         </AppContext.Provider>
       </Box>
     </Sluice>
+
+    {/* qr code modal */}
+    {qrinfo.visible && <>
+      <Box
+        sx={{
+          backgroundColor: 'rgba(0,0,0,0.5);',
+          height: '100%',
+          width: '100%',
+          position: 'absolute',
+          top: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+        }}
+        onClick={(e) => {
+          qrinfo.hide();
+        }}
+      >
+        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+
+          {/* qr code */}
+          <Box>
+            <img src={qrinfo.data} style={{backgroundColor: 'white'}}/>
+          </Box>
+        </Box>
+      </Box>
+    </>}
+
   </>
 }
 
 function Header () {
   const theme = useTheme();
-  const {onTagChange, qrinfo, showqr, hideqr} = useContext(AppContext);
+  const {onTagChange, qrinfo} = useContext(AppContext);
   const location = useLocation();
-  const [user, {clear_storage}] = useUser();
+  const { tag } = useParams();
 
   const is_big = useMediaQuery(theme.breakpoints.up('sm'));
+
+  function copyurl () {
+    const url = `https://games.oclyke.dev/call-late/${tag}`;
+    navigator.clipboard.writeText(url)
+    .catch(console.error);
+  }
 
   return <>
     <Box
@@ -129,20 +156,14 @@ function Header () {
       </Link>
 
     {location.pathname !== '/' && <>
-      <Box>
-        <button>
-          copy url
-        </button>
-        <button
-          onClick={(e) => {
-            showqr();
-          }}
-        >
-          show qr code
-        </button>
-        <button onClick={(e) => { clear_storage(); }}>
-          clear storage
-        </button>
+      <Box sx={{display: 'flex', flexDirection: 'row', flexGrow: 1, justifyContent: 'space-around'}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'end'}}>
+          <Stack direction='row' spacing={2}>
+            <HighlightType variant='h5'>{tag}</HighlightType>
+            <IconButton color='secondary' onClick={copyurl}><ContentCopyIcon/></IconButton>
+            <IconButton color='secondary' onClick={qrinfo.show}><QrCode2Icon/></IconButton>
+          </Stack>
+        </Box>
       </Box>
     </>}
 
